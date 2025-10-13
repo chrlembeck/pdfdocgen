@@ -1,0 +1,20 @@
+{
+  "name": "jspdf-test",
+  "version": "0.1",
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -p . -w",
+    "jspdftest": "node build/org/lembeck/easypdf/JsPdfTest.js",
+    "jspddocftest": "node build/org/lembeck/easypdf/JsPdfDocTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@types/fontkit": "^2.0.8",
+    "fontkit": "^2.0.4",
+    "jspdf": "^3.0.3"
+  }
+}
