@@ -2,3 +2,5 @@
 /examples/dist/
 /easypdf/node_modules/
 /examples/node_modules/
+/easypdf/test-document.pdf
+/easypdf/jspdf.pdf
