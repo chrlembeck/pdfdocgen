@@ -2,5 +2,5 @@ import jsPDF from 'jspdf';
 
 export interface LayoutedElement {
 
-  render(pdf: jsPDF): void;
+  render(pdf: jsPDF, debugOutput?: boolean): void;
 }

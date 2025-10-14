@@ -51,4 +51,25 @@ export class FontSpec {
   get style(): 'normal' | 'bold' | 'italic' | 'bolditalic' {
     return this._style;
   }
+
+  setFont(pdf: jsPDF, fontSize?: number) {
+    pdf.setFont(this._name, this._style);
+    if (fontSize) {
+      pdf.setFontSize(fontSize);
+    }
+  }
+
+  getAscent(pdf: jsPDF, fontSize: number) {
+    const font = this.getFontkitFont()
+    return font.ascent * fontSize / font.unitsPerEm / pdf.internal.scaleFactor;
+  }
+
+  getDescent(pdf: jsPDF, fontSize: number) {
+    const font = this.getFontkitFont();
+    return font.descent * fontSize / font.unitsPerEm / pdf.internal.scaleFactor;
+  }
+
+  getHeight(pdf: jsPDF, fontSize: number) {
+    return this.getAscent(pdf, fontSize) - this.getDescent(pdf, fontSize);
+  }
 }

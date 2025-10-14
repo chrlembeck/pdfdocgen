@@ -1,6 +1,7 @@
-import {SectionLayout} from './SectionLayout';
 import {LayoutedElement} from './LayoutedElement';
 import {FontSpec} from '../FontSpec';
+import {RenderedLayout} from './RenderedLayout';
+import {PdfSection} from '../template/PdfSection';
 
 export class PageLayout{
 
@@ -8,26 +9,33 @@ export class PageLayout{
 
   private _pageNumberSection: number;
 
-  private _sectionLayout: SectionLayout;
+  private _layout: RenderedLayout;
 
   private _layoutedElements: LayoutedElement[] = [];
 
-  constructor(sectionLayout: SectionLayout, pageNumberInSection: number, pageNumber: number) {
+  private _section: PdfSection;
+
+  constructor(layout: RenderedLayout, section: PdfSection, pageNumberInSection: number, pageNumber: number) {
     this._pageNumber = pageNumber;
     this._pageNumberSection = pageNumberInSection;
-    this._sectionLayout = sectionLayout;
+    this._section = section;
+    this._layout = layout;
   }
 
   get pageNumber(): number {
     return this._pageNumber;
   }
 
+  get section(): PdfSection {
+    return this._section;
+  }
+
   get pageNumberSection(): number {
     return this._pageNumberSection;
   }
 
-  get sectionLayout(): SectionLayout {
-    return this._sectionLayout;
+  get layout(): RenderedLayout {
+    return this._layout;
   }
 
   addLayoutedElement(layoutedElement: LayoutedElement) {
@@ -39,6 +47,6 @@ export class PageLayout{
   }
 
   registerFont(fontSpec: FontSpec) {
-    this._sectionLayout.registerFont(fontSpec);
+    this._layout.registerFont(fontSpec);
   }
 }

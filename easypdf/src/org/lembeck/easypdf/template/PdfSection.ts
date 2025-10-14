@@ -1,11 +1,12 @@
 import {PageOrientation} from './PageOrientation';
 import {PageSize} from './PageSize';
-import {PageBlock} from '../document/PageBlock';
 import {ContentArea} from './ContentArea';
 
 export class PdfSection {
 
   private _id: string;
+
+  private _numberOfPages: number | undefined;
 
   private _size: PageSize = PageSize.A4;
 
@@ -13,21 +14,29 @@ export class PdfSection {
 
   private _mainContentArea: ContentArea;
 
-  private _fixedContentAreas: ContentArea[] = [];
+  private _fixedContentAreas: Map<string, ContentArea> = new Map();
 
-  constructor(id: string, size: PageSize, orientation: PageOrientation, mainContentArea: ContentArea) {
+  constructor(id: string, size: PageSize, orientation: PageOrientation, mainContentArea: ContentArea, numberOfPages: number | undefined) {
     this._id = id;
     this._size = size;
     this._orientation = orientation;
     this._mainContentArea = mainContentArea;
+    this._numberOfPages = numberOfPages;
   }
 
   get id(): string {
     return this._id;
   }
 
-  addFixedContentArea(contentArea: ContentArea): ContentArea {
-    this._fixedContentAreas.push(contentArea);
+  get numberOfPages(): number | undefined {
+    return this._numberOfPages;
+  }
+
+  addFixedContentArea(id: string, contentArea: ContentArea): ContentArea {
+    if (!id || id.length === 0) {
+      throw new Error('id must not be empty.');
+    }
+    this._fixedContentAreas.set(id, contentArea);
     return contentArea;
   }
 
@@ -35,7 +44,7 @@ export class PdfSection {
     return this._mainContentArea;
   }
 
-  get fixedContentAreas(): ContentArea[] {
+  get fixedContentAreas(): Map<string, ContentArea> {
     return this._fixedContentAreas;
   }
 

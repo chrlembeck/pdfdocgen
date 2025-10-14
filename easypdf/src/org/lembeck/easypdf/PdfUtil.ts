@@ -3,13 +3,12 @@ import {jsPDF} from 'jspdf';
 import {PdfTemplate} from './template/PdfTemplate';
 import {RenderedLayout} from './layout/RenderedLayout';
 import {PdfSection} from './template/PdfSection';
-import {SectionLayout} from './layout/SectionLayout';
 import {PdfContent} from './document/PdfContent';
 import {ContentAreaType} from './template/ContentAreaType';
-import {ContentArea} from './template/ContentArea';
 import {PageLayout} from './layout/PageLayout';
-import {LayoutedText} from './layout/LayoutedText';
 import {FontSpec} from './FontSpec';
+import {ContentAreaRenderer} from './rendering/ContentAreaRenderer';
+import {ContentStream} from './rendering/ContentStream';
 
 export class PdfUtil {
 
@@ -89,81 +88,75 @@ export class PdfUtil {
     });
 
     const layout: RenderedLayout = new RenderedLayout(template);
+    PdfUtil.embedFonts(pdf, template, content, debugOutput || false);
 
-    let currentPageNumber = 1;
-    for (let sectionIdx = 0; sectionIdx < template.sections.length; sectionIdx++) {
-      const section: PdfSection = template.sections[sectionIdx];
-      if (sectionIdx > 0) {
+
+    const state = new LayoutState(content);
+    do {
+      const section: PdfSection = template.sections[state.currentSectionIndex];
+      if (state.currentPageNumber > 1) {
         pdf.addPage([section.size.widthMM, section.size.heightMM], section.orientation === 'portrait' ? 'portrait' : 'landscape');
       }
+      this.layoutPage(pdf, layout, section, state);
+      state.currentPageNumber++;
 
-      this.layoutSection(pdf, layout, section, content, currentPageNumber);
-      currentPageNumber = layout.pageCount + 1;
-    }
-    console.log("Rendered layout: ", layout);
+      // TODO: page in section number hochzählen
+      // TODO: Section-Wechsel realisieren
 
+      console.log(state.contentIndex + ' ' + content.getMainContent().length);
+    } while (!state.getMainContentStream().isEmpty());
+
+    console.log("Rendered layout: ", layout.pageLayouts);
     PdfUtil.renderLayout(pdf, template, layout, debugOutput);
-
     pdf.save(filename);
   }
 
-  private static layoutSection(pdf: jsPDF, layout: RenderedLayout, section: PdfSection, content: PdfContent, firstPageNumber: number) {
-    console.log('Layout section: ', section.id, ' starting at page ', firstPageNumber);
-    const sectionLayout = new SectionLayout(layout, section);
-    layout.addSectionLayout(sectionLayout);
-
-    if (section.mainContentArea) {
-      PdfUtil.layoutContentArea(pdf, sectionLayout, section.mainContentArea, content, firstPageNumber, ContentAreaType.FLOATING);
-    }
-
-    let currentPageNumber = firstPageNumber;
-    for (let pageLayout of sectionLayout.pageLayouts) {
-      for (let fixedArea of section.fixedContentAreas) {
-        PdfUtil.layoutContentArea(pdf, sectionLayout, fixedArea, content, currentPageNumber, ContentAreaType.FIX);
+  private static embedFonts(pdf: jsPDF, template: PdfTemplate, content: PdfContent, debugOutput: boolean) {
+    const fontMap: Map<string, Map<string, FontSpec>> = new Map();
+    let regFunc = (fontSpec: FontSpec) => {
+      if (!fontMap.has(fontSpec.name)) {
+        fontMap.set(fontSpec.name, new Map());
       }
-      currentPageNumber++;
+      const styleMap = fontMap.get(fontSpec.name)!;
+      if (!styleMap.has(fontSpec.style)) {
+        styleMap.set(fontSpec.style, fontSpec);
+        fontSpec.embedFont(pdf);
+      }
+    };
+    content.getMainContent().forEach(c => c.registerFonts(regFunc));
+    content.getContentKeys().forEach(key => content.getContent(key).forEach(c => c.registerFonts(regFunc)));
+    if (debugOutput) {
+      regFunc(FontSpec.JETBRAINS_MONO);
     }
   }
 
-  private static layoutContentArea(pdf: jsPDF, sectionLayout: SectionLayout, contentArea: ContentArea, content: PdfContent, pageNumber: number, areaType: ContentAreaType) {
-    console.log('Layout content area: ', contentArea.id, ' on page ', pageNumber, ' type ', areaType);
+  private static layoutPage(pdf: jsPDF, layout: RenderedLayout, section: PdfSection, state: LayoutState) {
+    console.log('Layout page: ', state.currentPageNumber, ' in section ', section.id, ' (page in section: ', state.currentPageInSectionNumber, ')');
+    const pageLayout: PageLayout = new PageLayout(layout, section, state.currentPageInSectionNumber, state.currentPageNumber);
+    layout.addPageLayout(pageLayout);
 
-    let pageNumberInSection = 1;
-    let layoutedText = new LayoutedText(contentArea.startXMM, contentArea.startyMM, contentArea.id, 'left', 0, FontSpec.LIBRE_BASKERVILLE, 8);
-    sectionLayout.registerFont(FontSpec.LIBRE_BASKERVILLE);
-    if (areaType == ContentAreaType.FLOATING) {
-      const pageLayout = new PageLayout(sectionLayout, pageNumberInSection, pageNumberInSection + pageNumber - 1);
-      sectionLayout.addPageLayout(pageLayout);
-      pageLayout.addLayoutedElement(layoutedText);
-
-    } else {
-      sectionLayout.pageLayouts[pageNumber - 1].addLayoutedElement(layoutedText);
+    for (let fixedArea of section.fixedContentAreas.entries()) {
+      let contentAreaId = fixedArea[0];
+      ContentAreaRenderer.layoutContentArea(pdf, pageLayout, contentAreaId, fixedArea[1], state.getContentStream(contentAreaId), state, ContentAreaType.FIX);
     }
+    ContentAreaRenderer.layoutContentArea(pdf, pageLayout, 'main', section.mainContentArea, state.getMainContentStream(), state, ContentAreaType.FLOATING);
   }
 
   private static renderLayout(pdf: jsPDF, template: PdfTemplate, layout: RenderedLayout, debugOutput?: boolean) {
-    if (debugOutput) {
-      layout.registerFont(FontSpec.JETBRAINS_MONO);
-    }
-    layout.registeredFonts.forEach(font => {font.embedFont(pdf)});
+    for (let pageLayout of layout.pageLayouts) {
+      pdf.setPage(pageLayout.pageNumber);
+      if (debugOutput) {
+        PdfUtil.paintSectionBorders(pdf, pageLayout);
+      }
 
-    for (let section of template.sections) {
-      const sectionLayout: SectionLayout = layout.sectionLayouts.get(section.id)!;
-      for (let pageLayout of sectionLayout.pageLayouts) {
-        pdf.setPage(pageLayout.pageNumber);
-        if (debugOutput) {
-          PdfUtil.paintSectionBorders(pdf, pageLayout);
-        }
-
-        for (let layoutedElement of pageLayout.layoutedElements) {
-          layoutedElement.render(pdf);
-        }
+      for (let layoutedElement of pageLayout.layoutedElements) {
+        layoutedElement.render(pdf, debugOutput);
       }
     }
   }
 
   private static paintSectionBorders(pdf: jsPDF, pageLayout: PageLayout) {
-    const section = pageLayout.sectionLayout.section;
+    const section = pageLayout.section;
     pdf.setDrawColor('#c0c0c0');
     pdf.setLineWidth(0.1)
     pdf.setLineDashPattern([], 0);
@@ -172,18 +165,20 @@ export class PdfUtil {
     pdf.setFont(FontSpec.JETBRAINS_MONO.name, FontSpec.JETBRAINS_MONO.style);
     pdf.setTextColor('#c0c0c0');
     const fontkitFont = FontSpec.JETBRAINS_MONO.getFontkitFont();
-    const dy = fontkitFont.ascent /fontkitFont.unitsPerEm * 8 / pdf.internal.scaleFactor;
+    const dy = fontkitFont.ascent / fontkitFont.unitsPerEm * 8 / pdf.internal.scaleFactor;
 
     if (section.mainContentArea) {
-      pdf.rect(section.mainContentArea.startXMM, section.mainContentArea.startyMM, section.mainContentArea.widthMM, section.mainContentArea.heightMM);
-      pdf.text(section.mainContentArea.id, section.mainContentArea.startXMM, section.mainContentArea.startyMM + dy, {
+      pdf.rect(section.mainContentArea.startXMM, section.mainContentArea.startYMM, section.mainContentArea.widthMM, section.mainContentArea.heightMM);
+      pdf.text('main', section.mainContentArea.startXMM, section.mainContentArea.startYMM + dy, {
         align: 'left'
       });
 
     }
-    for (let fixedArea of section.fixedContentAreas) {
-      pdf.rect(fixedArea.startXMM, fixedArea.startyMM, fixedArea.widthMM, fixedArea.heightMM);
-      pdf.text(fixedArea.id, fixedArea.startXMM, fixedArea.startyMM + dy, {
+    for (let fixedAreaEntry of section.fixedContentAreas.entries()) {
+      const id = fixedAreaEntry[0];
+      const fixedArea = fixedAreaEntry[1];
+      pdf.rect(fixedArea.startXMM, fixedArea.startYMM, fixedArea.widthMM, fixedArea.heightMM);
+      pdf.text(id, fixedArea.startXMM, fixedArea.startYMM + dy, {
         align: 'left'
       });
     }
@@ -193,20 +188,30 @@ export class PdfUtil {
     if (!template.sections || template.sections.length === 0) {
       throw new Error('Template must contain at least one section.');
     }
-    const contentIds = new Set<string>();
-
-    for (let sectionIdx = 0; sectionIdx < template.sections.length; sectionIdx++) {
-      const section = template.sections[sectionIdx];
-      if (section.mainContentArea) {
-        if (contentIds.has(section.mainContentArea.id)) {
-          throw new Error("Duplicate content area id: " + section.mainContentArea.id);
-        }
-      }
-      for (let fixedArea of section.fixedContentAreas) {
-        if (contentIds.has(fixedArea.id)) {
-          throw new Error("Duplicate content area id: " + fixedArea.id);
-        }
-      }
-    }
   }
+}
+
+export class LayoutState {
+
+  private _content: PdfContent;
+
+  private _mainContentStream: ContentStream;
+
+  constructor(content: PdfContent) {
+    this._content = content;
+    this._mainContentStream = new ContentStream(content.getMainContent());
+  }
+
+  getContentStream(id: string): ContentStream {
+    return new ContentStream(this._content.getContent(id));
+  }
+
+  getMainContentStream(): ContentStream {
+    return this._mainContentStream;
+  }
+
+  currentPageNumber: number = 1;
+  currentPageInSectionNumber: number = 1;
+  contentIndex: number = 0;
+  currentSectionIndex: number = 0;
 }

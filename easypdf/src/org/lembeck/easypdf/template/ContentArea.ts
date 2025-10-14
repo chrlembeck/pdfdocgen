@@ -1,38 +1,27 @@
-import {ContentAreaType} from './ContentAreaType';
 
 export class ContentArea {
 
-  private _id: string;
+  private  _startXMM: number;
 
-  private _startXMM: number;
-
-  private _startyMM: number;
+  private _startYMM: number;
 
   private _widthMM: number;
 
   private _heightMM: number;
 
-  constructor(id: string, startXMM: number, startyMM: number, widthMM: number, heightMM: number) {
-    if (!id || id.length === 0) {
-      throw new Error('id must not be empty.');
-    }
-    this._id = id;
+  constructor(startXMM: number, startYMM: number, widthMM: number, heightMM: number) {
     this._startXMM = startXMM;
-    this._startyMM = startyMM;
+    this._startYMM = startYMM;
     this._widthMM = widthMM;
     this._heightMM = heightMM;
-  }
-
-  get id(): string {
-    return this._id;
   }
 
   get startXMM(): number {
     return this._startXMM;
   }
 
-  get startyMM(): number {
-    return this._startyMM;
+  get startYMM(): number {
+    return this._startYMM;
   }
 
   get widthMM(): number {

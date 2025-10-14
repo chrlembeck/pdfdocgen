@@ -1,5 +1,4 @@
 import {FontSpec} from '../FontSpec';
-import {text} from 'node:stream/consumers';
 import {LayoutedElement} from './LayoutedElement';
 import jsPDF from 'jspdf';
 
@@ -29,15 +28,21 @@ export class LayoutedText implements LayoutedElement {
     this._fontSize = fontSize;
   }
 
-  render(pdf: jsPDF): void {
-        pdf.setFont(this._font.name, this._font.style);
-        pdf.setFontSize(this._fontSize);
-        pdf.setTextColor('#000000');
-        pdf.text(this._text, this._x, this._y, {
-          align: this._horizontalAlignment,
-          maxWidth: this._width
-        })
+  render(pdf: jsPDF, debugOutput?: boolean): void {
+    console.log('Rendering text at ' + this._x + '/' + this._y + ': ' + this._text + ' width: ' + this.width);
+
+    pdf.setFont(this._font.name, this._font.style);
+    pdf.setFontSize(this._fontSize);
+    pdf.setTextColor('#000000');
+    console.log(pdf.getTextWidth(this._text));
+    pdf.text(this._text, this._x, this._y, {
+      align: this._horizontalAlignment,
+      maxWidth: this._width + 0.001 // workaround to avoid unwanted line breaks due to rounding issues
+    });
+    if (debugOutput) {
+      // TODO draw ascent, descent...
     }
+  }
 
   get x(): number {
     return this._x;
