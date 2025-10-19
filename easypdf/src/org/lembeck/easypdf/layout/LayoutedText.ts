@@ -18,7 +18,9 @@ export class LayoutedText implements LayoutedElement {
 
   private _fontSize: number;
 
-  constructor(x: number, y: number, text: string, horizontalAlignment: 'left' | 'center' | 'right' | 'justify', width: number, font: FontSpec, fontSize: number) {
+  private _color?: string;
+
+  constructor(x: number, y: number, text: string, horizontalAlignment: 'left' | 'center' | 'right' | 'justify', width: number, font: FontSpec, fontSize: number, color?: string) {
     this._x = x;
     this._y = y;
     this._text = text;
@@ -26,6 +28,7 @@ export class LayoutedText implements LayoutedElement {
     this._width = width;
     this._font = font;
     this._fontSize = fontSize;
+    this._color = color;
   }
 
   render(pdf: jsPDF, debugOutput?: boolean): void {
@@ -33,7 +36,7 @@ export class LayoutedText implements LayoutedElement {
 
     pdf.setFont(this._font.name, this._font.style);
     pdf.setFontSize(this._fontSize);
-    pdf.setTextColor('#000000');
+    pdf.setTextColor(this._color || '#000000');
     console.log(pdf.getTextWidth(this._text));
     pdf.text(this._text, this._x, this._y, {
       align: this._horizontalAlignment,

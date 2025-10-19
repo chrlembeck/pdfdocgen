@@ -39,7 +39,7 @@ export class ContentAreaRenderer {
           if (lineIndex == 0 || line.height() <= remainingHeightMM) {
             cursorY += line.height();
             remainingHeightMM -= line.height();
-            line.addToPageLayout(pageLayout, contentArea.startXMM, cursorY, areaWidthMM);
+            line.addToPageLayout(pageLayout, contentArea.startXMM, cursorY, areaWidthMM, nextContent);
           } else {
             remainingLines.push(line);
             pageFull = true;

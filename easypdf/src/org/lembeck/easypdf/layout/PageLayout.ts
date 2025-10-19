@@ -1,5 +1,4 @@
 import {LayoutedElement} from './LayoutedElement';
-import {FontSpec} from '../FontSpec';
 import {RenderedLayout} from './RenderedLayout';
 import {PdfSection} from '../template/PdfSection';
 
@@ -44,9 +43,5 @@ export class PageLayout{
 
   get layoutedElements(): LayoutedElement[] {
     return this._layoutedElements;
-  }
-
-  registerFont(fontSpec: FontSpec) {
-    this._layout.registerFont(fontSpec);
   }
 }

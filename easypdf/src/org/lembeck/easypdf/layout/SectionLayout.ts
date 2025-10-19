@@ -1,7 +1,6 @@
 import {PdfSection} from '../template/PdfSection';
 import {RenderedLayout} from './RenderedLayout';
 import {PageLayout} from './PageLayout';
-import {FontSpec} from '../FontSpec';
 
 export class SectionLayout {
 
@@ -30,9 +29,5 @@ export class SectionLayout {
 
   get pageLayouts(): PageLayout[] {
     return this._pageLayouts;
-  }
-
-  registerFont(fontSpec: FontSpec) {
-    this._renderedLayout.registerFont(fontSpec);
   }
 }

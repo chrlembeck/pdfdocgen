@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import {SplitToken} from './Paragraph';
+import {Paragraph, SplitToken} from './Paragraph';
 import { FontSpec } from '../FontSpec';
 import {PageLayout} from '../layout/PageLayout';
 
@@ -8,5 +8,5 @@ export interface Token {
 
   registerFonts(register: (f: FontSpec) => void): void;
 
-  addToPageLayout(pageLayout: PageLayout, cursorX: number, cursorY: number, widthMM: number): void;
+  addToPageLayout(pageLayout: PageLayout, cursorX: number, cursorY: number, widthMM: number, paragraph: Paragraph): void;
 }
