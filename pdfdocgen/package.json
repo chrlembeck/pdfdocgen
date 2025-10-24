@@ -1,0 +1,48 @@
+{
+  "name": "pdfdocgen",
+  "version": "0.9.0",
+  "description": "PdfDocGen ist eine in Typescript geschriebene, template-basierte high level Library zur Generierung von PDF-Dokumenten im Front- oder Backend.",
+  "keywords": [
+    "pdf",
+    "typescript",
+    "Javascript",
+    "generator",
+    "creation",
+    "template based",
+    "high level",
+    "library",
+    "document",
+    "typesetting",
+    "layout"
+  ],
+  "type": "module",
+  "author": "Christoph Lembeck",
+  "homepage": "https://github.com/chrlembeck/jspdfgen",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrlembeck/jspdfgen.git"
+  },
+  "scripts": {
+    "pdfdocgen-build": "tsc -p .",
+    "pdfdocgen-watch": "tsc -p . -w",
+    "pdfdocgen-lint": "npx eslint ."
+  },
+  "main": "build/index.js",
+  "files": [
+    "fonts/**"
+  ],
+  "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@types/node": "^24.7.0",
+    "eslint": "^9.38.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
+  },
+  "dependencies": {
+    "@types/fontkit": "^2.0.8",
+    "fontkit": "^2.0.4",
+    "jspdf": "^3.0.3"
+  }
+}

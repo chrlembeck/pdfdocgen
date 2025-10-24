@@ -1,0 +1,23 @@
+{
+  "name": "pdfdocgen-examples",
+  "version": "0.9.0",
+  "description": "Beispiele für die Verwendung der pdfdocgen-Bibliothek.",
+  "scripts": {
+    "example-watch": "tsc -p . -w",
+    "example-letter": "node build/org/lembeck/pdfdocgen/LetterExample.js",
+    "example-jspdfdoc": "node build/org/lembeck/pdfdocgen/JsPdfDocTest.js",
+    "example-jspdf": "node build/org/lembeck/pdfdocgen/JsPdfTest.js"
+  },
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^24.7.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@types/fontkit": "^2.0.8",
+    "fontkit": "^2.0.4",
+    "jspdf": "^3.0.3",
+    "pdfdocgen": "file:../pdfdocgen"
+  }
+}

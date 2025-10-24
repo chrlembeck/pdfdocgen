@@ -1,6 +1,12 @@
-/easypdf/build/
-/examples/dist/
-/easypdf/node_modules/
+/pdfdocgen/build/
+/pdfdocgen/dist/
+/pdfdocgen/node_modules/
 /examples/node_modules/
+/examples/build/
+/examples/dist/
 /easypdf/test-document.pdf
 /easypdf/jspdf.pdf
+/examples/letter-example.pdf
+/examples/jspdf.pdf
+/examples/jspdfdoctest.pdf
+/.idea
