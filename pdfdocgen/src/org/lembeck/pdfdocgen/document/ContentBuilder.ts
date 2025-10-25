@@ -17,7 +17,7 @@ export class ContentBuilder {
 
   private _fontColor?: string;
 
-  private _horizontalAlignment: 'left' | 'center' | 'right' = 'left';
+  private _horizontalAlignment: 'left' | 'center' | 'right' | 'justify' = 'left';
 
   private _currentParagraph?: Paragraph;
 
@@ -90,6 +90,11 @@ export class ContentBuilder {
 
   alignRight(): ContentBuilder {
     this._horizontalAlignment = 'right';
+    return this;
+  }
+
+  alignJustify(): ContentBuilder {
+    this._horizontalAlignment = 'justify';
     return this;
   }
 

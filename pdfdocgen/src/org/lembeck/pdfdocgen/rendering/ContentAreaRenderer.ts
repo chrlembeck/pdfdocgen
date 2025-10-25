@@ -32,11 +32,12 @@ export function layoutContentArea(pdf: jsPDF,
     if (nextContent instanceof Paragraph) {
       const remainingLines = [];
       const tokenLines = nextContent.splitToLines(pdf, areaWidthMM);
-      for (const line of tokenLines) {
+      for (let lineIndex = 0; lineIndex < tokenLines.length; lineIndex++){
+        const line = tokenLines[lineIndex];
         if (cursorY === contentArea.startYMM || line.height() <= remainingHeightMM) {
           cursorY += line.height();
           remainingHeightMM -= line.height();
-          line.addToPageLayout(pageLayout, contentArea.startXMM, cursorY, areaWidthMM, nextContent);
+          line.addToPageLayout(pageLayout, contentArea.startXMM, cursorY, areaWidthMM, nextContent, lineIndex, tokenLines.length);
           if (nextContent.lineSpacing !== 1) {
             cursorY += line.height() * (nextContent.lineSpacing - 1);
             remainingHeightMM -= line.height() * (nextContent.lineSpacing - 1);

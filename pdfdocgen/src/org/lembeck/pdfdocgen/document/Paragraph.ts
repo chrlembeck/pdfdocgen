@@ -1,9 +1,7 @@
 import {Content} from './Content.js';
 import {jsPDF} from 'jspdf';
 import {Token} from './Token.js';
-import {FontSpec} from '../FontSpec.js';
 import {PageLayout} from '../layout/PageLayout.js';
-import {TextToken} from './TextToken.js';
 import {NewLineToken} from './NewLineToken.js';
 
 export class Paragraph implements Content {
@@ -16,10 +14,10 @@ export class Paragraph implements Content {
 
   private _lineSpacing: number = 1.15;
 
-  private _alignment: 'left' | 'center' | 'right' = 'left';
+  private _alignment: 'left' | 'center' | 'right' | 'justify' = 'left';
 
-  constructor(alignment: 'left' | 'center' | 'right' = 'left', ...tokens: Token[]) {
-    this.alignment = alignment;
+  constructor(alignment: 'left' | 'center' | 'right' | 'justify' = 'left', ...tokens: Token[]) {
+    this._alignment = alignment;
     if (tokens) {
       for (const token of tokens) {
         this._tokens.push(token);
@@ -55,11 +53,11 @@ export class Paragraph implements Content {
     this._lineSpacing = value;
   }
 
-  get alignment(): 'left' | 'center' | 'right' {
+  get alignment(): 'left' | 'center' | 'right' | 'justify' {
     return this._alignment;
   }
 
-  set alignment(alignment: 'left' | 'center' | 'right') {
+  set alignment(alignment: 'left' | 'center' | 'right' | 'justify') {
     this._alignment = alignment;
   }
 
@@ -224,15 +222,20 @@ export class ParagraphLine {
     return offset;
   }
 
-  addToPageLayout(pageLayout: PageLayout, startXMM: number, cursorY: number, areaWidthMM: number, paragraph: Paragraph) {
+  addToPageLayout(pageLayout: PageLayout, startXMM: number, cursorY: number, areaWidthMM: number, paragraph: Paragraph, lineIndex: number, totalNumberOfLines: number) {
     let cursorX = startXMM;
     const baselineOffset = this.baselineOfsetMM();
-    for (const lineToken of this.tokens) {
+    for (let tokenIndex = 0; tokenIndex < this.tokens.length; tokenIndex++) {
+      const lineToken = this.tokens[tokenIndex];
       let dx = 0;
       if (paragraph.alignment === 'center') {
         dx = Math.max(0, (areaWidthMM - this.widthWithoutTrailingWhitespaceMM()) / 2);
       } else if (paragraph.alignment === 'right') {
         dx = Math.max(0, areaWidthMM - this.widthWithoutTrailingWhitespaceMM());
+      } else if (paragraph.alignment === 'justify') {
+
+        dx = (tokenIndex === 0 || this.endedByManualLineBreak || lineIndex == totalNumberOfLines - 1) ? 0 : tokenIndex * (areaWidthMM - this.widthWithoutTrailingWhitespaceMM()) / (this.tokens.length - 1);
+        console.log('DX = ' + dx)
       }
       lineToken.token.addToPageLayout(pageLayout, cursorX + dx, cursorY - baselineOffset, lineToken.widthMM, paragraph);
       cursorX += lineToken.widthMM;
