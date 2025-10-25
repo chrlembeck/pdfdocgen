@@ -10,8 +10,4 @@ export class SpecialContent implements Content {
     this.type = type;
     this.sectionId = sectionId;
   }
-
-  registerFonts(): void {
-    // no fonts to register
-  }
 }

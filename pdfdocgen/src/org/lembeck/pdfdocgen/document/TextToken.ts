@@ -4,6 +4,7 @@ import {Paragraph, SplitToken} from './Paragraph.js';
 import {jsPDF} from 'jspdf';
 import {PageLayout} from '../layout/PageLayout.js';
 import {LayoutedText} from '../layout/LayoutedText.js';
+import {NewLineToken} from './NewLineToken.js';
 
 export class TextToken implements Token {
 
@@ -92,12 +93,40 @@ export class TextToken implements Token {
     return this._color;
   }
 
-  registerFonts(register: (f: FontSpec) => void): void {
-    register(this._font);
-  }
-
   addToPageLayout(pageLayout: PageLayout, cursorX: number, cursorY: number, widthMM: number, paragraph: Paragraph): void {
     const layoutedText = new LayoutedText(cursorX, cursorY, this._text, 'left', widthMM, this._font, this._fontSize, this.color || paragraph.color);
     pageLayout.addLayoutedElement(layoutedText);
+  }
+
+  normalize(): Token[] {
+    console.log('Normalisiere "' + this._text + '"');
+    const result: Token[] = [];
+    const str = this._text.replace(/\r/g, '');
+    let left: string = '';
+    let idx = 0;
+    while (idx < str.length) {
+      if (str.charAt(idx) === '\n') {
+        if (left && left.length > 0) {
+          result.push(this.withText(left));
+          left = '';
+        }
+        result.push(new NewLineToken());
+      } else if (str.charAt(idx) === ' ') {
+        left += str.charAt(idx);
+      } else {
+        if (left && left.length > 0 && left.charAt(left.length - 1) === ' ') {
+          result.push(this.withText(left));
+          left = str.charAt(idx);
+        } else {
+          left += str.charAt(idx);
+        }
+      }
+      idx++;
+    }
+    if (left.length > 0) {
+      result.push(this.withText(left));
+    }
+    console.log('Ergebnis: ' + JSON.stringify(result));
+    return result.length > 1 ? result : [this];
   }
 }

@@ -6,7 +6,8 @@
     "example-watch": "tsc -p . -w",
     "example-letter": "node build/org/lembeck/pdfdocgen/LetterExample.js",
     "example-jspdfdoc": "node build/org/lembeck/pdfdocgen/JsPdfDocTest.js",
-    "example-jspdf": "node build/org/lembeck/pdfdocgen/JsPdfTest.js"
+    "example-jspdf": "node build/org/lembeck/pdfdocgen/JsPdfTest.js",
+    "example-hello-world": "node build/org/lembeck/pdfdocgen/HelloWorld.js"
   },
   "type": "module",
   "private": true,

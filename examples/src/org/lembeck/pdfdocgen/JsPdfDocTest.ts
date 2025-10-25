@@ -7,8 +7,9 @@ import {
   PdfContent,
   PdfSection,
   PdfTemplate,
-  PdfUtil
 } from 'pdfdocgen';
+
+import * as pdg from 'pdfdocgen';
 
 export class JsPdfDocTest {
 
@@ -76,7 +77,7 @@ export class JsPdfDocTest {
     content.setMainContent(...cb.content);
 
 
-    PdfUtil.renderDocument(template, content, 'jspdfdoctest.pdf', true);
+    pdg.renderDocumentToFile(template, content, 'jspdfdoctest.pdf', true);
   }
 }
 

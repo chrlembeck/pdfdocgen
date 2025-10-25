@@ -3,6 +3,8 @@ import {jsPDF} from 'jspdf';
 import {Token} from './Token.js';
 import {FontSpec} from '../FontSpec.js';
 import {PageLayout} from '../layout/PageLayout.js';
+import {TextToken} from './TextToken.js';
+import {NewLineToken} from './NewLineToken.js';
 
 export class Paragraph implements Content {
 
@@ -81,6 +83,7 @@ export class Paragraph implements Content {
     if (this._tokens.length === 0) {
       return [];
     }
+    this.normalizeTokens();
     const result: ParagraphLine[] = [];
     let remainingMM = areaWidthMM;
     let currentLine = new ParagraphLine();
@@ -88,57 +91,63 @@ export class Paragraph implements Content {
     let currentToken: Token | undefined = this._tokens[0];
     let tokenIndex = 0;
     while (currentToken) {
-      const splitToken: SplitToken = currentToken.splitToken(pdf, remainingMM);
-      if (splitToken.first.widthWithoutTrailingWhitespaceMM <= remainingMM) {
-        // Token oder ein Teil davon passt in die Zeile
-        currentLine.tokens.push(splitToken.first);
-        if (splitToken.remaining) {
-          // Token wurde geteilt, der Rest kommt in die nächste Zeile
-          currentToken = splitToken.remaining;
+      if (currentToken instanceof NewLineToken) {
+        console.log('NEW LINE TOKEN');
+        tokenIndex++;
+        currentLine.endedByManualLineBreak = true;
+        if (tokenIndex < this._tokens.length) {
+          remainingMM = areaWidthMM;
           currentLine = new ParagraphLine();
           result.push(currentLine);
-          remainingMM = areaWidthMM;
-          continue;
-        } else {
-          // Ganzes Token wurde verarbeitet, nächstes Token holen
-          tokenIndex++;
-          currentToken = tokenIndex < this._tokens.length ? this._tokens[tokenIndex] : undefined;
-          remainingMM -= splitToken.first.widthMM;
-          continue;
         }
+        currentToken = tokenIndex < this._tokens.length ? this._tokens[tokenIndex] : undefined;
       } else {
-        // das erste Token passt nicht in die Zeile
-        if (currentLine.widthMM() > 0) {
-          // Zeile war schon angefangen, also neue Zeile anfangen
-          currentLine = new ParagraphLine();
-          result.push(currentLine);
-          remainingMM = areaWidthMM;
-          continue;
-        } else {
-          // Token passt nicht in die Zeile, die Zeile war aber leer. - Es gibt einen Überhang.
-          console.warn('Token passt nicht in die Zeile: ' + JSON.stringify(splitToken.first) + ' remaining: ' + JSON.stringify(splitToken.remaining));
+        const splitToken: SplitToken = currentToken.splitToken(pdf, remainingMM);
+        if (splitToken.first.widthWithoutTrailingWhitespaceMM <= remainingMM) {
+          // Token oder ein Teil davon passt in die Zeile
           currentLine.tokens.push(splitToken.first);
-          // Zeile ist jetzt voll.
-          currentLine = new ParagraphLine();
-          result.push(currentLine);
-          remainingMM = areaWidthMM;
           if (splitToken.remaining) {
+            // Token wurde geteilt, der Rest kommt in die nächste Zeile
             currentToken = splitToken.remaining;
+            currentLine = new ParagraphLine();
+            result.push(currentLine);
+            remainingMM = areaWidthMM;
+            continue;
           } else {
+            // Ganzes Token wurde verarbeitet, nächstes Token holen
             tokenIndex++;
             currentToken = tokenIndex < this._tokens.length ? this._tokens[tokenIndex] : undefined;
+            remainingMM -= splitToken.first.widthMM;
+            continue;
           }
-          continue;
+        } else {
+          // das erste Token passt nicht in die Zeile
+          if (currentLine.widthMM() > 0) {
+            // Zeile war schon angefangen, also neue Zeile anfangen
+            currentLine = new ParagraphLine();
+            result.push(currentLine);
+            remainingMM = areaWidthMM;
+            continue;
+          } else {
+            // Token passt nicht in die Zeile, die Zeile war aber leer. - Es gibt einen Überhang.
+            console.warn('Token passt nicht in die Zeile: ' + JSON.stringify(splitToken.first) + ' remaining: ' + JSON.stringify(splitToken.remaining));
+            currentLine.tokens.push(splitToken.first);
+            // Zeile ist jetzt voll.
+            currentLine = new ParagraphLine();
+            result.push(currentLine);
+            remainingMM = areaWidthMM;
+            if (splitToken.remaining) {
+              currentToken = splitToken.remaining;
+            } else {
+              tokenIndex++;
+              currentToken = tokenIndex < this._tokens.length ? this._tokens[tokenIndex] : undefined;
+            }
+            continue;
+          }
         }
       }
     }
     return result;
-  }
-
-  registerFonts(register: (f: FontSpec) => void): void {
-    for (const token of this._tokens) {
-      token.registerFonts(register)
-    }
   }
 
   asThis(): Paragraph {
@@ -146,6 +155,22 @@ export class Paragraph implements Content {
     p.color = this._color;
     p._spaceBelow = this._spaceBelow;
     return p;
+  }
+
+  /**
+   * Sorgt dafür, dass alle Text-Token, in denen besondere Steuerzeichen, wie z.B. Zeilenumbrüche vorkommen,
+   * in einzelne Token mit reinem Text und Token für die Steuerzeichen augeteilt werden.
+   * @private
+   */
+  private normalizeTokens() {
+    for (let idx = 0; idx < this._tokens.length; idx++) {
+      const token = this._tokens[idx];
+      const normalized: Token[] = token.normalize();
+      if (normalized && normalized.length > 1) {
+        this._tokens.splice(idx, 1, ...normalized);
+        idx += normalized.length - 1;
+      }
+    }
   }
 }
 
@@ -157,6 +182,8 @@ export interface SplitToken {
 export class ParagraphLine {
 
   tokens: LineToken[] = [];
+
+  endedByManualLineBreak: boolean = false;
 
   widthMM(): number {
     let width = 0;

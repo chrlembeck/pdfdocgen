@@ -6,12 +6,14 @@ export class PdfContent {
 
   private contentMap: Map<string, PdfContentSupplier> = new Map<string, PdfContentSupplier>();
 
-  public setContent(key: string, content: Content[]) {
+  public setContent(key: string, content: Content[]):PdfContent {
     this.contentMap.set(key, new ConstantPdfContentSupplier(content));
+    return this;
   }
 
-  public setContentProvider(key: string, contentSupplier: PdfContentSupplier) {
+  public setContentProvider(key: string, contentSupplier: PdfContentSupplier): PdfContent {
     this.contentMap.set(key, contentSupplier);
+    return this;
   }
 
   public getContent(key: string): PdfContentSupplier {
@@ -25,8 +27,9 @@ export class PdfContent {
     }
   }
 
-  public setMainContent(...content: Content[]) {
+  public setMainContent(...content: Content[]): PdfContent {
     this.setContent('main', content);
+    return this;
   }
 
   public getMainContent(): PdfContentSupplier {

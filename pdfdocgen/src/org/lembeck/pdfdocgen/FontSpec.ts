@@ -1,10 +1,9 @@
 import * as fontkit from 'fontkit';
 import {jsPDF} from 'jspdf';
-import {PdfUtil} from './PdfUtil.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
-
+import { embedFont } from './PdfDocGen.js'
 
 export class FontSpec {
 
@@ -55,7 +54,7 @@ export class FontSpec {
   }
 
   embedFont(doc: jsPDF) {
-    PdfUtil.embedFont(doc, this.getFontFilename(this._filename), this._name + '-' + this._style, this._name, this._style);
+    embedFont(doc, this.getFontFilename(this._filename), this._name + '-' + this._style, this._name, this._style);
   }
 
   private getFontFilename(filename: string): string {

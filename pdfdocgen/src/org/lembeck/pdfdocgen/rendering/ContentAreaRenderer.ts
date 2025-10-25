@@ -2,12 +2,12 @@ import {jsPDF} from 'jspdf';
 import {PageLayout} from '../layout/PageLayout.js';
 import {ContentAreaType} from '../template/ContentAreaType.js';
 import {ContentArea} from '../template/ContentArea.js';
-import {LayoutState} from '../PdfUtil.js';
 import {Paragraph} from '../document/Paragraph.js';
 import {ContentStream} from './ContentStream.js';
 import {SpecialContent} from '../document/SpecialContent.js';
 import {ImageContent} from '../document/ImageContent.js';
 import {ImageElement} from '../template/ImageElement.js';
+import {LayoutState} from '../layout/LayoutState.js';
 
 export function layoutContentArea(pdf: jsPDF,
                                   pageLayout: PageLayout,

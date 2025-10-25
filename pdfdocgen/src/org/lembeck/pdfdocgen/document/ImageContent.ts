@@ -25,8 +25,4 @@ export class ImageContent implements Content {
   get imageData(): Uint8Array {
     return this._imageData;
   }
-
-  registerFonts(): void {
-    // No fonts to register
-  }
 }

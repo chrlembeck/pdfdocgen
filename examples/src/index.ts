@@ -1,8 +1,8 @@
 
-//import {PdfUtil} from '@chrlembeck/jspdfgen';
+//import {PdfDocGen} from '@chrlembeck/jspdfgen';
 
 /*
 export {
-  PdfUtil
+  PdfDocGen
 }
 */
