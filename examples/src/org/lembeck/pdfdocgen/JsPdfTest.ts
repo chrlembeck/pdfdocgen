@@ -80,6 +80,28 @@ export class JsPdfTest {
     this.checkText(doc, 'JetBrainsMono ÂyÜ| Hello World!', 20, 120, 12, FontSpec.JETBRAINS_MONO_BOLD);
     this.checkText(doc, 'JetBrainsMono ÂyÜ| Hello World!', 20, 130, 12, FontSpec.JETBRAINS_MONO_BOLD_ITALIC);
 
+
+    doc.context2d.save(); // Zustand Speichern
+    doc.context2d.fillStyle = '#f00000';
+    doc.context2d.strokeStyle = '#000000';
+    doc.context2d.lineWidth = 1;
+    doc.context2d.rect(80, 10, 50, 50);
+    doc.context2d.fill();
+    doc.context2d.stroke();
+    doc.context2d.clip(); // Clip-Rect festlegen (letzte gemalte Figur)
+    doc.context2d.arc(100, 60, 35, 0, 2*Math.PI, false);
+    doc.context2d.fill();
+    doc.context2d.stroke();
+    doc.context2d.restore(); // Zustand zurücksetzen
+    doc.context2d.beginPath();
+
+    doc.context2d.fillStyle = '#ff00ff80';
+    doc.context2d.arc(130, 60, 35, 0, 2*Math.PI, false);
+    doc.context2d.fill();
+    doc.context2d.stroke();
+
+
+
     doc.save("jspdf.pdf");
 
     console.log(doc.internal.scaleFactor);

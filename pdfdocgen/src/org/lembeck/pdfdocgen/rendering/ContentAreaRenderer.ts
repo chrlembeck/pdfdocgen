@@ -8,6 +8,8 @@ import {SpecialContent} from '../document/SpecialContent.js';
 import {ImageContent} from '../document/ImageContent.js';
 import {ImageElement} from '../template/ImageElement.js';
 import {LayoutState} from '../layout/LayoutState.js';
+import {FloatingGraphic} from '../document/FloatingGraphic.js';
+import {GraphicElement} from '../layout/GraphicElement.js';
 
 export function layoutContentArea(pdf: jsPDF,
                                   pageLayout: PageLayout,
@@ -74,8 +76,18 @@ export function layoutContentArea(pdf: jsPDF,
         // Das Bild passt nicht mehr auf die Seite
         pageFull = true;
       }
+    } else if (nextContent instanceof FloatingGraphic) {
+      if (cursorY === contentArea.startYMM || remainingHeightMM >= nextContent.heightMM) {
+        pageLayout.addLayoutedElement(new GraphicElement(contentArea.startXMM, cursorY, nextContent));
+        content.remove();
+        cursorY += nextContent.heightMM;
+        remainingHeightMM -= nextContent.heightMM;
+      } else {
+        // Das Bild passt nicht mehr auf die Seite
+        pageFull = true;
+      }
     } else {
-      throw new Error('Unsupported content type: ' + typeof nextContent);
+      throw new Error('Unsupported content type: ' + nextContent.constructor.name);
     }
   } while (!pageFull && !content.isEmpty());
 }

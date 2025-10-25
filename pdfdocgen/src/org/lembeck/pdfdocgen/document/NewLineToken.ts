@@ -1,7 +1,9 @@
 import {Token} from './Token.js';
 import {jsPDF} from 'jspdf';
-import {LineToken, Paragraph, SplitToken} from './Paragraph.js';
+import {Paragraph} from './Paragraph.js';
 import {PageLayout} from '../layout/PageLayout.js';
+import {LineToken} from '../layout/LineToken.js';
+import {SplitToken} from '../layout/SplitToken.js';
 
 export class NewLineToken implements Token {
 

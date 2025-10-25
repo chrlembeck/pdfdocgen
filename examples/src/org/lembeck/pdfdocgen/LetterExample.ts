@@ -3,7 +3,7 @@ import {
   ContentArea,
   ContentBuilder,
   FontSpec,
-  Content
+  Content, LineStyle
 } from 'pdfdocgen';
 
 import * as pdg from 'pdfdocgen';
@@ -22,9 +22,9 @@ export class LetterExample {
     seite1.addFixedContentArea('fuss3', new ContentArea(20 + 88, 272, 38, 20));
     seite1.addFixedContentArea('fuss4', new ContentArea(20 + 88 + 44, 272, 38, 20));
     const logo = fs.readFileSync('img/abc-logo.png');
-    seite1.addGraphicElement(new pdg.Rectangle(0, 15, 145, 20, '#5CA595'));
+    seite1.addGraphicElement(new pdg.Rectangle(0, 15, 145, 20, undefined, '#5CA595'));
     seite1.addGraphicElement(new pdg.ImageElement(150, 15, 36.61, 20, logo));
-    seite1.addGraphicElement(new pdg.Rectangle(150 + 5 + 36.61, 15, 18.39, 20, '#5CA595'));
+    seite1.addGraphicElement(new pdg.Rectangle(150 + 5 + 36.61, 15, 18.39, 20, undefined, '#5CA595'));
 
     /*
      * Falzmarke 1: 105 mm von der oberen Blattkante

@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
-import {Paragraph, SplitToken} from './Paragraph.js';
+import {Paragraph} from './Paragraph.js';
 import {PageLayout} from '../layout/PageLayout.js';
+import {SplitToken} from '../layout/SplitToken.js';
 
 export interface Token {
   splitToken(pdf: jsPDF, remainingMM: number): SplitToken;

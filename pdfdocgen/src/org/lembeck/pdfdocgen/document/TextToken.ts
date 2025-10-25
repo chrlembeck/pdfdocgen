@@ -1,10 +1,11 @@
 import {Token} from './Token.js';
 import {FontSpec} from '../FontSpec.js';
-import {Paragraph, SplitToken} from './Paragraph.js';
+import {Paragraph} from './Paragraph.js';
 import {jsPDF} from 'jspdf';
 import {PageLayout} from '../layout/PageLayout.js';
 import {LayoutedText} from '../layout/LayoutedText.js';
 import {NewLineToken} from './NewLineToken.js';
+import {SplitToken} from '../layout/SplitToken.js';
 
 export class TextToken implements Token {
 

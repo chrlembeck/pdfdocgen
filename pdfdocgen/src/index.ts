@@ -12,12 +12,14 @@ import {FontSpec} from './org/lembeck/pdfdocgen/FontSpec.js';
 import {PdfTemplate} from './org/lembeck/pdfdocgen/template/PdfTemplate.js';
 import {Content} from './org/lembeck/pdfdocgen/document/Content.js';
 import {renderDocumentToFile} from './org/lembeck/pdfdocgen/PdfDocGen.js'
-import { TextToken } from './org/lembeck/pdfdocgen/document/TextToken.js';
+import {TextToken} from './org/lembeck/pdfdocgen/document/TextToken.js';
+import {FloatingGraphic} from './org/lembeck/pdfdocgen/document/FloatingGraphic.js';
 
 export {
   Content,
   ContentArea,
   ContentBuilder,
+  FloatingGraphic,
   FontSpec,
   ImageElement,
   Line,
@@ -28,6 +30,6 @@ export {
   PdfSection,
   PdfTemplate,
   Rectangle,
-    TextToken,
+  TextToken,
   renderDocumentToFile
 };

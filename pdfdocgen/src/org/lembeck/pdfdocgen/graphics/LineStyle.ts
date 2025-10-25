@@ -49,4 +49,32 @@ export class LineStyle {
     pdf.setLineMiterLimit(this._lineMiterLimit);
     pdf.setLineDashPattern(this._dashArray, this._dashPhase);
   }
+
+  get lineWidth() {
+    return this._lineWidth;
+  }
+
+  get capStyle() {
+    return this._capStyle;
+  }
+
+  get joinStyle() {
+    return this._joinStyle;
+  }
+
+  get dashArray() {
+    return this._dashArray;
+  }
+
+  get dashPhase() {
+    return this._dashPhase;
+  }
+
+  get lineColor() {
+    return this._lineColor;
+  }
+
+  get lineMiterLimit() {
+    return this._lineMiterLimit;
+  }
 }

@@ -1,15 +1,17 @@
 import {
   ContentArea,
   ContentBuilder,
+  FloatingGraphic,
   FontSpec,
   PageOrientation,
   PageSize,
   PdfContent,
   PdfSection,
-  PdfTemplate,
+  PdfTemplate, TextToken,
 } from 'pdfdocgen';
 
 import * as pdg from 'pdfdocgen';
+import {Paragraph} from 'pdfdocgen/build/org/lembeck/pdfdocgen/document/Paragraph.js';
 
 export class JsPdfDocTest {
 
@@ -42,7 +44,9 @@ export class JsPdfDocTest {
     cb.newParagraph().fontSize(16).text('This one too.');
     cb.newParagraph().fontSize(14).alignCenter().text('This paragraph is centered.');
     cb.newParagraph().fontSize(12).text('So as this one is.');
-    cb.newParagraph().text('This paragraph is centered and is very long to demonstrate how text wrapping works in centered paragraphs. Let\'s add some more text to make sure it wraps around to the next line properly. Yes, this should be enough text now.');
+    cb.newParagraph().spaceBelow(3).text('This paragraph is centered and is very long to demonstrate how text wrapping works in centered paragraphs. Let\'s add some more text to make sure it wraps around to the next line properly. Yes, this should be enough text now.');
+
+    cb.newParagraph().alignJustify().text('This paragraph is aligned justified. It is a very long paragraph to show, how justified text looks like. If you add a manual line break (\\n), the last line before the break will not be aligned justified but aligned to the left instead.\nJust like the line before this line.');
 
     cb.newParagraph().reset().fontColor('#7070d0');
     cb.text('You can specify a color for a paragraph.');
@@ -55,6 +59,8 @@ export class JsPdfDocTest {
     .fontColor(undefined).text('.');
     cb.newParagraph().fontColor('#7070d0').text('You can even mix paragraph colors ')
     .fontColor('#d070d0').text('and token colors.');
+
+
 
     cb.reset().newPage().font(FontSpec.ROBOTO);
     cb.text('First Paragraph on new page after page break.');
@@ -75,7 +81,11 @@ export class JsPdfDocTest {
     cb.newParagraph().text('i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i');
     cb.newParagraph().alignJustify().text('Hello World').text('SomeXXXXXX').text('MoreXXXXXX').text('TestXXXXXX').text('SomeXXXXXX').text('MoreXXXXXX').text('TestXXXXXX').text('SomeXXXXXX').text('MoreXXXXXX').text('TestXXXXXXX').text('Some').text('More').text('Test').text('Some').text('More').text('Test').text('Some').text('More').text('Test').text('Some').text('More').text('Test');
 
-    content.setMainContent(...cb.content);
+
+    const par = new Paragraph();
+    par.addToken(new TextToken('Hello World', FontSpec.ARIMO, 24));
+
+    content.setMainContent(...cb.content, new FloatingGraphic(40, 40), par, new FloatingGraphic(60, 60), par, new FloatingGraphic(50, 30), par);
 
 
     pdg.renderDocumentToFile(template, content, 'jspdfdoctest.pdf', true);
