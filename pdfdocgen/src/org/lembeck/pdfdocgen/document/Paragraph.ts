@@ -3,6 +3,7 @@ import {jsPDF} from 'jspdf';
 import {Token} from './Token.js';
 import {PageLayout} from '../layout/PageLayout.js';
 import {NewLineToken} from './NewLineToken.js';
+import {TextToken} from './TextToken.js';
 
 export class Paragraph implements Content {
 
@@ -225,6 +226,21 @@ export class ParagraphLine {
   addToPageLayout(pageLayout: PageLayout, startXMM: number, cursorY: number, areaWidthMM: number, paragraph: Paragraph, lineIndex: number, totalNumberOfLines: number) {
     let cursorX = startXMM;
     const baselineOffset = this.baselineOfsetMM();
+
+    let adjustableSpaceCount = 0;
+    const adjustableSpacesBefore = [0];
+    if (paragraph.alignment == 'justify') {
+      for (let tokenIndex = 1; tokenIndex < this.tokens.length; tokenIndex++) {
+        const left = this.tokens[tokenIndex - 1];
+        const right = this.tokens[tokenIndex];
+        if ((left.token instanceof TextToken && left.token.text.endsWith(' '))
+            || (right.token instanceof TextToken && right.token.text.startsWith(' '))) {
+          adjustableSpaceCount++;
+        }
+        adjustableSpacesBefore[tokenIndex] = adjustableSpaceCount;
+      }
+    }
+
     for (let tokenIndex = 0; tokenIndex < this.tokens.length; tokenIndex++) {
       const lineToken = this.tokens[tokenIndex];
       let dx = 0;
@@ -233,9 +249,8 @@ export class ParagraphLine {
       } else if (paragraph.alignment === 'right') {
         dx = Math.max(0, areaWidthMM - this.widthWithoutTrailingWhitespaceMM());
       } else if (paragraph.alignment === 'justify') {
-
-        dx = (tokenIndex === 0 || this.endedByManualLineBreak || lineIndex == totalNumberOfLines - 1) ? 0 : tokenIndex * (areaWidthMM - this.widthWithoutTrailingWhitespaceMM()) / (this.tokens.length - 1);
-        console.log('DX = ' + dx)
+        dx = (adjustableSpaceCount === 0 || tokenIndex === 0 || this.endedByManualLineBreak || lineIndex == totalNumberOfLines - 1) ? 0 :
+            adjustableSpacesBefore[tokenIndex] * (areaWidthMM - this.widthWithoutTrailingWhitespaceMM()) / (adjustableSpaceCount);
       }
       lineToken.token.addToPageLayout(pageLayout, cursorX + dx, cursorY - baselineOffset, lineToken.widthMM, paragraph);
       cursorX += lineToken.widthMM;

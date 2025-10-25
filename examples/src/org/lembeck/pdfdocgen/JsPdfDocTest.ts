@@ -73,6 +73,7 @@ export class JsPdfDocTest {
     cb.newParagraph().text('At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam');
 
     cb.newParagraph().text('i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i-i');
+    cb.newParagraph().alignJustify().text('Hello World').text('SomeXXXXXX').text('MoreXXXXXX').text('TestXXXXXX').text('SomeXXXXXX').text('MoreXXXXXX').text('TestXXXXXX').text('SomeXXXXXX').text('MoreXXXXXX').text('TestXXXXXXX').text('Some').text('More').text('Test').text('Some').text('More').text('Test').text('Some').text('More').text('Test').text('Some').text('More').text('Test');
 
     content.setMainContent(...cb.content);
 

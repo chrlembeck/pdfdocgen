@@ -99,7 +99,6 @@ export class TextToken implements Token {
   }
 
   normalize(): Token[] {
-    console.log('Normalisiere "' + this._text + '"');
     const result: Token[] = [];
     const str = this._text.replace(/\r/g, '');
     let left: string = '';
@@ -126,7 +125,6 @@ export class TextToken implements Token {
     if (left.length > 0) {
       result.push(this.withText(left));
     }
-    console.log('Ergebnis: ' + JSON.stringify(result));
     return result.length > 1 ? result : [this];
   }
 }
