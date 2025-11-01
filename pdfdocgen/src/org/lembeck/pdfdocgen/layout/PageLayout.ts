@@ -7,7 +7,7 @@ export class PageLayout {
 
   private _pageNumber: number;
 
-  private _pageNumberSection: number;
+  private _pageNumberInSection: number;
 
   private _layout: RenderedLayout;
 
@@ -15,9 +15,21 @@ export class PageLayout {
 
   private _section: PdfSection;
 
+  /**
+   * Gesamtzahl der Seiten in dem Dokument. Steht erst zur Verfügung, wenn der main-Content-Bereich des Dokuments generiert wurde.
+   * Die Zahl kann daher nur bei der Erstellung der fixen-Sektionen des Dokuments (wie z.B. in Kopf- und Fusszeilen) verwendet werden.
+   */
+  private _totalNumberOfPages?: number;
+
+  /**
+   * Gesamtzahl der Seiten innerhalb des aktuellen Abschnitts. Steht erst zur Verfügung, wenn der main-Content-Bereich des Dokuments generiert wurde.
+   * Die Zahl kann daher nur bei der Erstellung der fixen-Sektionen des Dokuments (wie z.B. in Kopf- und Fusszeilen) verwendet werden.
+   */
+  private _totalNumberOfPagesInSection?: number;
+
   constructor(layout: RenderedLayout, section: PdfSection, pageNumberInSection: number, pageNumber: number) {
     this._pageNumber = pageNumber;
-    this._pageNumberSection = pageNumberInSection;
+    this._pageNumberInSection = pageNumberInSection;
     this._section = section;
     this._layout = layout;
   }
@@ -30,8 +42,8 @@ export class PageLayout {
     return this._section;
   }
 
-  get pageNumberSection(): number {
-    return this._pageNumberSection;
+  get pageNumberInSection(): number {
+    return this._pageNumberInSection;
   }
 
   get layout(): RenderedLayout {
@@ -44,5 +56,21 @@ export class PageLayout {
 
   get layoutedElements(): LayoutedElement[] {
     return this._layoutedElements;
+  }
+
+  get totalNumberOfPagesInSection(): number | undefined {
+    return this._totalNumberOfPagesInSection;
+  }
+
+  set totalNumberOfPagesInSection(totalNumberOfPagesInSection: number) {
+    this._totalNumberOfPagesInSection = totalNumberOfPagesInSection;
+  }
+
+  get totalNumberOfPages(): number | undefined {
+    return this._totalNumberOfPages;
+  }
+
+  set totalNumberOfPages(totalNumberOfPages: number) {
+    this._totalNumberOfPages = totalNumberOfPages;
   }
 }

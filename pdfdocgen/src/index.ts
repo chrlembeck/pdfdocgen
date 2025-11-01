@@ -6,7 +6,7 @@ import {ContentArea} from './org/lembeck/pdfdocgen/template/ContentArea.js';
 import {PdfSection} from './org/lembeck/pdfdocgen/template/PdfSection.js';
 import {PageSize} from './org/lembeck/pdfdocgen/template/PageSize.js';
 import {PageOrientation} from './org/lembeck/pdfdocgen/template/PageOrientation.js';
-import {PdfContent} from './org/lembeck/pdfdocgen/document/PdfContent.js';
+import {PdfContentMap} from './org/lembeck/pdfdocgen/document/PdfContentMap.js';
 import {ContentBuilder} from './org/lembeck/pdfdocgen/document/ContentBuilder.js';
 import {FontSpec} from './org/lembeck/pdfdocgen/FontSpec.js';
 import {PdfTemplate} from './org/lembeck/pdfdocgen/template/PdfTemplate.js';
@@ -26,7 +26,7 @@ export {
   LineStyle,
   PageOrientation,
   PageSize,
-  PdfContent,
+  PdfContentMap,
   PdfSection,
   PdfTemplate,
   Rectangle,

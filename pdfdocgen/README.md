@@ -8,4 +8,19 @@ Die Templates können dabei mehrere Sektionen beinhalten, welche verschiedene Se
 Für die Generierung des Dokuments muss das Template mit Inhalten befüllt werden. Diese werden abstrakt in Form von Absätzen, Sätzen, einzelnen Satzteilen und Grafiken definiert.
 Die Positionierung und Ausrichtung der Texte und Grafiken innerhalb des PDF-Dokuments, so wie Zeilen- und Seitenumbrüche werden durch die Bibliothek selbst ermittelt. Als Nutzer der Bibliothek muss man also Zeilenabstände und Größen einzelner Zeilen oder Texte nicht selbst berechnen.
 
-Für weitere Infos besuchen sie die [Projekt-Homepage](https://github.com/chrlembeck/jspdfgen).  
+Ein minimales Beispiel einer Dokumenterzeuge sieht z.B. wie folgt aus:
+```typescript
+import * as pdg from 'pdfdocgen';
+
+const template = new pdg.PdfTemplate();
+template.addSection(
+    new pdg.PdfSection('hello', pdg.PageSize.A4, pdg.PageOrientation.PORTRAIT,
+        new pdg.ContentArea(10, 10, 190, 277), undefined));
+
+const content = new pdg.PdfContentMap().setMainContent(
+    ...new pdg.ContentBuilder().text('Hello World!').content);
+
+pdg.renderDocumentToFile(template, content, "hello-world.pdf");
+```
+
+Für weitere Informationen besuchen sie die [Projekt-Homepage](https://github.com/chrlembeck/jspdfgen).  

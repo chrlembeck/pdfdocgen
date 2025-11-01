@@ -1,3 +1,4 @@
+import {LineStyle} from '../graphics/LineStyle.js';
 
 export class ContentArea {
 
@@ -9,11 +10,14 @@ export class ContentArea {
 
   private _heightMM: number;
 
-  constructor(startXMM: number, startYMM: number, widthMM: number, heightMM: number) {
+  private _borderStyle?: LineStyle;
+
+  constructor(startXMM: number, startYMM: number, widthMM: number, heightMM: number, borderStyle?: LineStyle) {
     this._startXMM = startXMM;
     this._startYMM = startYMM;
     this._widthMM = widthMM;
     this._heightMM = heightMM;
+    this._borderStyle = borderStyle;
   }
 
   get startXMM(): number {
@@ -30,5 +34,9 @@ export class ContentArea {
 
   get heightMM(): number {
     return this._heightMM;
+  }
+
+  get borderStyle(): LineStyle | undefined {
+    return this._borderStyle;
   }
 }

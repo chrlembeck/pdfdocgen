@@ -2,16 +2,16 @@ import {Content} from './Content.js';
 import {PdfContentSupplier} from './PdfContentSupplier.js';
 import {ConstantPdfContentSupplier} from './ConstantPdfContentSupplier.js';
 
-export class PdfContent {
+export class PdfContentMap {
 
   private contentMap: Map<string, PdfContentSupplier> = new Map<string, PdfContentSupplier>();
 
-  public setContent(key: string, content: Content[]):PdfContent {
+  public setContent(key: string, ...content: Content[]):PdfContentMap {
     this.contentMap.set(key, new ConstantPdfContentSupplier(content));
     return this;
   }
 
-  public setContentProvider(key: string, contentSupplier: PdfContentSupplier): PdfContent {
+  public setContentProvider(key: string, contentSupplier: PdfContentSupplier): PdfContentMap {
     this.contentMap.set(key, contentSupplier);
     return this;
   }
@@ -27,8 +27,8 @@ export class PdfContent {
     }
   }
 
-  public setMainContent(...content: Content[]): PdfContent {
-    this.setContent('main', content);
+  public setMainContent(...content: Content[]): PdfContentMap {
+    this.setContent('main', ...content);
     return this;
   }
 

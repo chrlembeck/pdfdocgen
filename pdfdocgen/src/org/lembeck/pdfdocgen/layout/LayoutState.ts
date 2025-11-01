@@ -1,10 +1,10 @@
-import {PdfContent} from '../document/PdfContent.js';
+import {PdfContentMap} from '../document/PdfContentMap.js';
 import {ContentStream} from '../rendering/ContentStream.js';
 import {PageInfo} from '../document/PdfContentSupplier.js';
 
 export class LayoutState {
 
-  private _content: PdfContent;
+  private _content: PdfContentMap;
 
   private readonly _mainContentStream: ContentStream;
 
@@ -12,11 +12,15 @@ export class LayoutState {
 
   currentPageInSectionNumber: number = 1;
 
-  currentSectionIndex: number = 0;
+  currentSectionId: string;
 
-  constructor(content: PdfContent) {
+  currentSectionIndex: number;
+
+  constructor(content: PdfContentMap, sectionIndex: number, sectionId: string) {
     this._content = content;
     this._mainContentStream = new ContentStream(content.getMainContent().content(new PageInfo(1, 1, 'main')));
+    this.currentSectionIndex = sectionIndex;
+    this.currentSectionId = sectionId;
   }
 
   getContentStream(contentId: string, pageInfo: PageInfo): ContentStream {

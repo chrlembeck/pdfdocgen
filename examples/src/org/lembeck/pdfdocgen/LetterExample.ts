@@ -8,7 +8,6 @@ import {
 
 import * as pdg from 'pdfdocgen';
 
-
 export class LetterExample {
 
   main(): void {
@@ -17,31 +16,28 @@ export class LetterExample {
     const seite1 = new pdg.PdfSection('seite1', pdg.PageSize.A4, pdg.PageOrientation.PORTRAIT, seite1text, 1);
     seite1.addFixedContentArea('adresse', new ContentArea(25, 45, 80, 40));
     seite1.addFixedContentArea('kontakt', new ContentArea(135, 45, 55, 50));
-    seite1.addFixedContentArea('fuss1', new ContentArea(20, 272, 38, 20));
-    seite1.addFixedContentArea('fuss2', new ContentArea(20 + 44, 272, 38, 20));
-    seite1.addFixedContentArea('fuss3', new ContentArea(20 + 88, 272, 38, 20));
-    seite1.addFixedContentArea('fuss4', new ContentArea(20 + 88 + 44, 272, 38, 20));
+    seite1.addFixedContentArea('fuss1', new ContentArea(20, 272, 38, 15));
+    seite1.addFixedContentArea('fuss2', new ContentArea(64, 272, 38, 15));
+    seite1.addFixedContentArea('fuss3', new ContentArea(108, 272, 38, 15));
+    seite1.addFixedContentArea('fuss4', new ContentArea(156, 272, 38, 15));
     const logo = fs.readFileSync('img/abc-logo.png');
     seite1.addGraphicElement(new pdg.Rectangle(0, 15, 145, 20, undefined, '#5CA595'));
     seite1.addGraphicElement(new pdg.ImageElement(150, 15, 36.61, 20, logo));
     seite1.addGraphicElement(new pdg.Rectangle(150 + 5 + 36.61, 15, 18.39, 20, undefined, '#5CA595'));
-
-    /*
-     * Falzmarke 1: 105 mm von der oberen Blattkante
+    /* Falzmarke 1: 105 mm von der oberen Blattkante
      * Lochmarke: 148,5 mm von der oberen Blattkante
-     * Falzmarke 2: 210 mm von der oberen Blattkante
-     */
+     * Falzmarke 2: 210 mm von der oberen Blattkante */
     seite1.addGraphicElement(new pdg.Line(0, 105, 5, 105, new pdg.LineStyle('#a0a0a0', 0.1)));
     seite1.addGraphicElement(new pdg.Line(0, 148.5, 7, 148.5, new pdg.LineStyle('#a0a0a0', 0.1)));
     seite1.addGraphicElement(new pdg.Line(0, 210, 5, 210, new pdg.LineStyle('#a0a0a0', 0.1)));
 
-
     const folgeseiten = new pdg.PdfSection('folgeseiten', pdg.PageSize.A4, pdg.PageOrientation.PORTRAIT, new pdg.ContentArea(20, 25, 170, 247), undefined);
+    folgeseiten.addFixedContentArea('seitenzahl', new ContentArea(20, 277, 170, 9));
 
     template.addSection(seite1);
     template.addSection(folgeseiten);
 
-    const content = new pdg.PdfContent();
+    const content = new pdg.PdfContentMap();
 
     const fuss1text = new ContentBuilder().font(FontSpec.ROBOTO).fontSize(6.5).spaceBelow(1).fontColor('#a0a0a0')
     .text('ABC Versicherung')
@@ -85,6 +81,10 @@ export class LetterExample {
     .newParagraph().text('Mo - Fr: 08:00 - 18:00 Uhr')
         .content;
 
+    const seitenzahlText = new ContentBuilder().font(FontSpec.LIBRE_BASKERVILLE).fontSize(8).alignCenter()
+      .text('- ').currentPageNumber().text('/').totalNumberOfPages().text(' -')
+      .content;
+
     const brieftext: Content[] = new ContentBuilder().font(FontSpec.LIBRE_BASKERVILLE_BOLD).fontSize(12).spaceBelow(10)
     .text('Ihr Anliegen vom 13. Juni 2024')
     .newParagraph().spaceBelow(4).font(FontSpec.LIBRE_BASKERVILLE).fontSize(11)
@@ -104,14 +104,15 @@ export class LetterExample {
     .newParagraph().text('Anna Beispiel')
 
     .text('')
-        .content;
+    .content;
 
-    content.setContent('fuss1', fuss1text);
-    content.setContent('fuss2', fuss2text);
-    content.setContent('fuss3', fuss3text);
-    content.setContent('fuss4', fuss4text);
-    content.setContent('adresse', adresstext);
-    content.setContent('kontakt', kontakttext);
+    content.setContent('fuss1', ...fuss1text);
+    content.setContent('fuss2', ...fuss2text);
+    content.setContent('fuss3', ...fuss3text);
+    content.setContent('fuss4', ...fuss4text);
+    content.setContent('adresse', ...adresstext);
+    content.setContent('kontakt', ...kontakttext);
+    content.setContent('seitenzahl', ...seitenzahlText);
     content.setMainContent(...brieftext);
     pdg.renderDocumentToFile(template, content, 'letter-example.pdf', false);
   }

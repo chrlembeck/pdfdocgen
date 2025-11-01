@@ -4,6 +4,8 @@ import {Token} from './Token.js';
 import {NewLineToken} from './NewLineToken.js';
 import {ParagraphLine} from '../layout/ParagraphLine.js';
 import {SplitToken} from '../layout/SplitToken.js';
+import { LayoutState } from '../layout/LayoutState.js';
+import {PageLayout} from '../layout/PageLayout.js';
 
 export class Paragraph implements Content {
 
@@ -78,7 +80,7 @@ export class Paragraph implements Content {
     this._spaceBelow = value;
   }
 
-  splitToLines(pdf: jsPDF, areaWidthMM: number): ParagraphLine[] {
+  splitToLines(pdf: jsPDF, areaWidthMM: number, state: LayoutState, layout: PageLayout): ParagraphLine[] {
     if (this._tokens.length === 0) {
       return [];
     }
@@ -101,7 +103,7 @@ export class Paragraph implements Content {
         }
         currentToken = tokenIndex < this._tokens.length ? this._tokens[tokenIndex] : undefined;
       } else {
-        const splitToken: SplitToken = currentToken.splitToken(pdf, remainingMM);
+        const splitToken: SplitToken = currentToken.splitToken(pdf, remainingMM, state, layout);
         if (splitToken.first.widthWithoutTrailingWhitespaceMM <= remainingMM) {
           // Token oder ein Teil davon passt in die Zeile
           currentLine.tokens.push(splitToken.first);

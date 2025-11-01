@@ -2,6 +2,7 @@ import {PageLayout} from './PageLayout.js';
 import {TextToken} from '../document/TextToken.js';
 import {Paragraph} from '../document/Paragraph.js';
 import {LineToken} from './LineToken.js';
+import {LayoutState} from './LayoutState.js';
 
 export class ParagraphLine {
 
@@ -48,7 +49,7 @@ export class ParagraphLine {
     return offset;
   }
 
-  addToPageLayout(pageLayout: PageLayout, startXMM: number, cursorY: number, areaWidthMM: number, paragraph: Paragraph, lineIndex: number, totalNumberOfLines: number) {
+  addToPageLayout(pageLayout: PageLayout, startXMM: number, cursorY: number, areaWidthMM: number, paragraph: Paragraph, lineIndex: number, totalNumberOfLines: number, state: LayoutState) {
     let cursorX = startXMM;
     const baselineOffset = this.baselineOfsetMM();
 
@@ -77,7 +78,7 @@ export class ParagraphLine {
         dx = (adjustableSpaceCount === 0 || tokenIndex === 0 || this.endedByManualLineBreak || lineIndex == totalNumberOfLines - 1) ? 0 :
             adjustableSpacesBefore[tokenIndex] * (areaWidthMM - this.widthWithoutTrailingWhitespaceMM()) / (adjustableSpaceCount);
       }
-      lineToken.token.addToPageLayout(pageLayout, cursorX + dx, cursorY - baselineOffset, lineToken.widthMM, paragraph);
+      lineToken.token.addToPageLayout(pageLayout, cursorX + dx, cursorY - baselineOffset, lineToken.widthMM, paragraph, state);
       cursorX += lineToken.widthMM;
     }
   }

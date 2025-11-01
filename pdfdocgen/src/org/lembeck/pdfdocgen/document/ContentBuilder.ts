@@ -4,6 +4,11 @@ import {TextToken} from './TextToken.js';
 import {SpecialContent} from './SpecialContent.js';
 import {Content} from './Content.js';
 import {ImageContent} from './ImageContent.js';
+import {CurrentPageNumberToken} from './CurrentPageNumberToken.js';
+import {TotalNumberOfPagesToken} from './TotalNumberOfPagesToken.js';
+import {NewLineToken} from './NewLineToken.js';
+import {CurrentPageNumberInSectionToken} from './CurrentPageNumberInSectionToken.js';
+import {TotalNumberOfPagesInSectionToken} from './TotalNumberOfPagesInSectionToken.js';
 
 export class ContentBuilder {
 
@@ -37,8 +42,11 @@ export class ContentBuilder {
     return this._content;
   }
 
-  font(font: FontSpec): ContentBuilder {
+  font(font: FontSpec, fontSize?: number): ContentBuilder {
     this._font = font;
+    if (fontSize) {
+      this._fontSize = fontSize;
+    }
     return this;
   }
 
@@ -53,6 +61,36 @@ export class ContentBuilder {
   }
 
   text(text: string): ContentBuilder {
+    this.checkParagraph();
+    this._currentParagraph!.addToken(new TextToken(text, this._font, this._fontSize, this._fontColor));
+    return this;
+  }
+
+  currentPageNumber(): ContentBuilder {
+    this.checkParagraph();
+    this._currentParagraph!.addToken(new CurrentPageNumberToken(this._font, this._fontSize, this._fontColor));
+    return this;
+  }
+
+  totalNumberOfPages() {
+    this.checkParagraph();
+    this._currentParagraph!.addToken(new TotalNumberOfPagesToken(this._font, this._fontSize, this._fontColor));
+    return this;
+  }
+
+  totalNumberOfPagesInSection() {
+    this.checkParagraph();
+    this._currentParagraph!.addToken(new TotalNumberOfPagesInSectionToken(this._font, this._fontSize, this._fontColor));
+    return this;
+  }
+
+  currentPageNumberInSection() {
+    this.checkParagraph();
+    this._currentParagraph!.addToken(new CurrentPageNumberInSectionToken(this._font, this._fontSize, this._fontColor));
+    return this;
+  }
+
+  private checkParagraph() {
     if (!this._currentParagraph) {
       this._currentParagraph = new Paragraph(this._horizontalAlignment);
       this._currentParagraph.spaceBelow = this._spaceBelow;
@@ -62,8 +100,6 @@ export class ContentBuilder {
       }
       this._content.push(this._currentParagraph);
     }
-    this._currentParagraph.addToken(new TextToken(text, this._font, this._fontSize, this._fontColor));
-    return this;
   }
 
   newParagraph(): ContentBuilder {
@@ -80,6 +116,18 @@ export class ContentBuilder {
   newPage(): ContentBuilder {
     this._currentParagraph = undefined;
     this._content.push(new SpecialContent('next_page'));
+    return this;
+  }
+
+  nextSection() {
+    this._currentParagraph = undefined;
+    this._content.push(new SpecialContent('next_section'));
+    return this;
+  }
+
+  jumpToSection(sectionID: string) {
+    this._currentParagraph = undefined;
+    this._content.push(new SpecialContent('jump_section', sectionID));
     return this;
   }
 
@@ -116,6 +164,12 @@ export class ContentBuilder {
     if (this._currentParagraph) {
       this._currentParagraph.spaceBelow = space;
     }
+    return this;
+  }
+
+  lineBreak() {
+    this.checkParagraph();
+    this._currentParagraph!.addToken(new NewLineToken());
     return this;
   }
 }

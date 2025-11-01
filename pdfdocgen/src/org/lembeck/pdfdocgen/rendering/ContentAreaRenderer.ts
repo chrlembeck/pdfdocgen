@@ -10,6 +10,7 @@ import {ImageElement} from '../template/ImageElement.js';
 import {LayoutState} from '../layout/LayoutState.js';
 import {FloatingGraphic} from '../document/FloatingGraphic.js';
 import {GraphicElement} from '../layout/GraphicElement.js';
+import {LayoutResult} from '../layout/LayoutResult.js';
 
 export function layoutContentArea(pdf: jsPDF,
                                   pageLayout: PageLayout,
@@ -17,29 +18,30 @@ export function layoutContentArea(pdf: jsPDF,
                                   contentArea: ContentArea,
                                   content: ContentStream,
                                   state: LayoutState,
-                                  areaType: ContentAreaType): void {
+                                  areaType: ContentAreaType): LayoutResult {
   console.log('Layout content area: ', areaId, ' on page ', state.currentPageNumber, ' type ', areaType);
   if (content.isEmpty()) {
-    return;
+    return new LayoutResult();
   }
 
   const areaWidthMM = contentArea.widthMM;
   const areaHeightMM = contentArea.heightMM;
   let cursorY = contentArea.startYMM;
   let remainingHeightMM = areaHeightMM;
+  let result: LayoutResult = new LayoutResult();
 
   let pageFull = false;
   do {
     const nextContent = content.seek();
     if (nextContent instanceof Paragraph) {
       const remainingLines = [];
-      const tokenLines = nextContent.splitToLines(pdf, areaWidthMM);
+      const tokenLines = nextContent.splitToLines(pdf, areaWidthMM, state, pageLayout);
       for (let lineIndex = 0; lineIndex < tokenLines.length; lineIndex++){
         const line = tokenLines[lineIndex];
         if (cursorY === contentArea.startYMM || line.height() <= remainingHeightMM) {
           cursorY += line.height();
           remainingHeightMM -= line.height();
-          line.addToPageLayout(pageLayout, contentArea.startXMM, cursorY, areaWidthMM, nextContent, lineIndex, tokenLines.length);
+          line.addToPageLayout(pageLayout, contentArea.startXMM, cursorY, areaWidthMM, nextContent, lineIndex, tokenLines.length, state);
           if (nextContent.lineSpacing !== 1) {
             cursorY += line.height() * (nextContent.lineSpacing - 1);
             remainingHeightMM -= line.height() * (nextContent.lineSpacing - 1);
@@ -62,6 +64,14 @@ export function layoutContentArea(pdf: jsPDF,
       if (nextContent.type === 'next_page') {
         content.remove();
         pageFull = true;
+      } else if (nextContent.type === 'next_section') {
+        content.remove();
+        pageFull = true;
+        result.newSectionIndex = state.currentSectionIndex + 1;
+      } else if (nextContent.type === 'jump_section') {
+        content.remove();
+        pageFull = true;
+        result.newSectionId = nextContent.sectionId;
       } else {
         throw new Error('Unsupported special content type: ' + nextContent.type);
       }
@@ -87,7 +97,10 @@ export function layoutContentArea(pdf: jsPDF,
         pageFull = true;
       }
     } else {
+      console.log(nextContent);
+      console.log(JSON.stringify(nextContent));
       throw new Error('Unsupported content type: ' + nextContent.constructor.name);
     }
   } while (!pageFull && !content.isEmpty());
+  return result;
 }

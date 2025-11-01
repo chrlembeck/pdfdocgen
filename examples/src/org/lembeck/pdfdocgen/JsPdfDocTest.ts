@@ -5,7 +5,7 @@ import {
   FontSpec,
   PageOrientation,
   PageSize,
-  PdfContent,
+  PdfContentMap,
   PdfSection,
   PdfTemplate, TextToken,
 } from 'pdfdocgen';
@@ -16,29 +16,45 @@ import {Paragraph} from 'pdfdocgen/build/org/lembeck/pdfdocgen/document/Paragrap
 export class JsPdfDocTest {
 
   main(): void {
+
+
+
     const template: PdfTemplate = new PdfTemplate();
     const contentArea1 = new ContentArea(20, 25, 170, 247);
     const section = template.addSection(new PdfSection('kapitel 1', PageSize.A4, PageOrientation.PORTRAIT, contentArea1, undefined));
     const kopfzeile1 = section.addFixedContentArea('kopfzeile1', new ContentArea(10, 5, 190, 15));
     const fusszeile1 = section.addFixedContentArea('fusszeile1', new ContentArea(10, 277, 190, 15));
 
-    const content: PdfContent = new PdfContent();
+    template.addSection(new PdfSection('section 1', PageSize.A4, PageOrientation.PORTRAIT, new ContentArea(40, 100, 130, 97), 3));
+    template.addSection(new PdfSection('section 2', PageSize.A4, PageOrientation.PORTRAIT, new ContentArea(20, 20, 170, 257), undefined));
+
+    new ContentBuilder().text("Hello page 1")
+    .newPage()
+    .text('This is the second page')
+    .nextSection()
+    .text('This is the third page. It has the format of the second section.')
+    .jumpToSection('section 1')
+    .text('This is the fourth page. It has the format of the first section again.')
+    .content;
+
+
+    const content: PdfContentMap = new PdfContentMap();
+    content.setContent("fusszeile1", ...new ContentBuilder().alignCenter().text('Seite ').currentPageNumber().text(' von ').totalNumberOfPages().content);
+
+
+    const mld: FontSpec = FontSpec.fromFile('MonsieurLaDoulaise-Regular','normal','./fonts/MonsieurLaDoulaise/MonsieurLaDoulaise-Regular.ttf');
     const cb: ContentBuilder = new ContentBuilder();
-    cb.text('First Token');
-    cb.fontSize(26).text('Second Token');
-    cb.fontSize(14).text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
-    cb.text('Third Token');
+    cb.font(mld).text("MonsieurLaDoulaise")
+    .font(FontSpec.ARIMO, 24).text("Arimo")
+    .font(FontSpec.LIBRE_BASKERVILLE, 14).text("Libre Baskerville")
+    .font(mld).text('MonsieurLaDoulaise')
+    .font(FontSpec.JETBRAINS_MONO, 8).text("JetBrainsMono")
+    .font(FontSpec.LIBRE_BASKERVILLE, 12);
+    cb.spaceBelow(3);
+    cb.newParagraph().alignCenter().text('This paragraph is displayed centered.')
+    .newParagraph().alignRight().text('This paragraph is right aligned.')
+    .newParagraph().alignLeft().text('And this one left aligned.')
+    .newParagraph().alignJustify().text('This paragraph is aligned justified. It is a very long paragraph to show, how justified text looks like.')
 
     cb.newParagraph().fontSize(12).alignRight().font(FontSpec.ROBOTO).text('This line is aligned right.');
     cb.newParagraph().fontSize(16).text('This one too.');
@@ -48,18 +64,25 @@ export class JsPdfDocTest {
 
     cb.newParagraph().alignJustify().text('This paragraph is aligned justified. It is a very long paragraph to show, how justified text looks like. If you add a manual line break (\\n), the last line before the break will not be aligned justified but aligned to the left instead.\nJust like the line before this line.');
 
-    cb.newParagraph().reset().fontColor('#7070d0');
-    cb.text('You can specify a color for a paragraph.');
-    cb.newParagraph().fontColor(undefined).text('You can use ')
+    cb.newParagraph().reset().fontColor('#7070d0')
+    .text('You can specify a color for a paragraph.')
+    .newParagraph().fontColor(undefined).text('You can use ')
     .fontColor('#d04070').text('different ')
     .fontColor('#70d0d0').text('colors ')
     .fontColor('#7070d0').text('for ')
     .fontColor('#d0d070').text('single ')
-    .fontColor('#f0a060').text('Tokens')
-    .fontColor(undefined).text('.');
-    cb.newParagraph().fontColor('#7070d0').text('You can even mix paragraph colors ')
+    .fontColor('#f0a060').text('tokens')
+    .fontColor(undefined).text('.')
+    .newParagraph().fontColor('#7070d0').text('You can even mix paragraph colors ')
     .fontColor('#d070d0').text('and token colors.');
 
+    cb.reset().spaceBelow(7);
+    cb.newParagraph().lineSpacing(1)
+        .text('The spacing between the lines in this text is exactly as large as the height of the font requires, so that there is no overlap of the letters across the lines.')
+    .newParagraph().lineSpacing(1.15)
+    .text('The line spacing in this text is 1.15 times larger than the font height required, so that there is no overlap of letters across the lines.')
+    .newParagraph().lineSpacing(1.5)
+    .text('The line spacing in this text is 1.5 times larger than the font height required, so that there is no overlap of letters across the lines.')
 
 
     cb.reset().newPage().font(FontSpec.ROBOTO);
@@ -88,7 +111,7 @@ export class JsPdfDocTest {
     content.setMainContent(...cb.content, new FloatingGraphic(40, 40), par, new FloatingGraphic(60, 60), par, new FloatingGraphic(50, 30), par);
 
 
-    pdg.renderDocumentToFile(template, content, 'jspdfdoctest.pdf', true);
+    pdg.renderDocumentToFile(template, content, 'jspdfdoctest.pdf', false);
   }
 }
 

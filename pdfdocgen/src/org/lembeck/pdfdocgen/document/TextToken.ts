@@ -6,6 +6,7 @@ import {PageLayout} from '../layout/PageLayout.js';
 import {LayoutedText} from '../layout/LayoutedText.js';
 import {NewLineToken} from './NewLineToken.js';
 import {SplitToken} from '../layout/SplitToken.js';
+import {LayoutState} from '../layout/LayoutState.js';
 
 export class TextToken implements Token {
 
@@ -94,7 +95,7 @@ export class TextToken implements Token {
     return this._color;
   }
 
-  addToPageLayout(pageLayout: PageLayout, cursorX: number, cursorY: number, widthMM: number, paragraph: Paragraph): void {
+  addToPageLayout(pageLayout: PageLayout, cursorX: number, cursorY: number, widthMM: number, paragraph: Paragraph, state: LayoutState): void {
     const layoutedText = new LayoutedText(cursorX, cursorY, this._text, 'left', widthMM, this._font, this._fontSize, this.color || paragraph.color);
     pageLayout.addLayoutedElement(layoutedText);
   }
