@@ -1,6 +1,6 @@
 {
   "name": "pdfdocgen-examples",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Beispiele für die Verwendung der pdfdocgen-Bibliothek.",
   "scripts": {
     "example-watch": "tsc -p . -w",
