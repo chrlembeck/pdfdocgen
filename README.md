@@ -16,6 +16,7 @@ Auf diese Art und Weise ist es möglich auch relativ komplexe Dokumente, wie z.B
 ## PdfDocGen unterstützt dabei unter anderem folgende Funktionen
 - [Formatierung von Texten mit verschiedenen ttf-Schriftarten, auch innerhalb eines Satzes wechselnd](#formatierung-von-texten-mit-verschiedenen-ttf-schriftarten-auch-innerhalb-eines-satzes-wechselnd)
 - [Links- und Rechtsbündige Ausrichtung von Absätzen, so wie Zentrierung oder Blocksatz](#links--und-rechtsbündige-ausrichtung-von-absätzen-so-wie-zentrierung-oder-blocksatz)
+- [Linker und rechter Einzug](#linker-und-rechter-einzug)
 - [Darstellung des Textes in verschiedenen Farben](#darstellung-des-textes-in-verschiedenen-farben)
 - [Definition des Zeilenabstands als Faktor abhängig von der Größe der gewählten Schrift](#definition-des-zeilenabstands-als-faktor-abhängig-von-der-größe-der-gewählten-schrift)
 - [Manuelle Seiten- und Abschnittsumbrüche](#manuelle-seiten--und-abschnittsumbrüche)
@@ -52,6 +53,26 @@ const content = new ContentBuilder()
   .content;
 ```
 ![Pararaph alignment](./doc/img/paragraph_alignment.png)
+
+### Linker und rechter Einzug
+Für jeden Absatz kann die Einrüchung der ersten, so wie die linke Einrückung jeder folgenden Zeile festgelegt werden.
+Zudem kann für einen Absatz ein zusätzlicher Abstand vom rechten Rand angegeben werden:
+```typescript
+cb.newParagraph().alignJustify()
+  .text('This is a paragraph without any indentation or right margins. ')
+  .text('It starts at the left side of the content area and ends at its right border.')
+  .newParagraph().firstLineIndentation(20)
+  .followingLinesIndentation(30)
+  .rightMargin(10)
+  .text('The first line of a Paragraph can have an own indentation. This one has one of 20 mm. ')
+  .text('Each following line can have another indentation. Here it is 30 mm for the second an all following lines. ')
+  .text('Although the whole paragraph can be specified to have a right margin. In this paragraph it is set to 10 mm.')
+  .reset().newParagraph().alignJustify()
+  .text('This is a paragraph without any indentation or right margins. ')
+  .text('It starts at the left side of the content area and ends at its right border.')
+  .spaceBelow(3);
+```
+![Left indentation and right margin](./doc/img/indentation_right_margin.png)
 
 ### Darstellung des Textes in verschiedenen Farben.
 Texte können in beliebigen Farben dargestellt werden. Dabei ist es egal, ob die Farben für ganze Absätze, Sätze, Zeilen oder einzelne Satzteile definiert werden: 

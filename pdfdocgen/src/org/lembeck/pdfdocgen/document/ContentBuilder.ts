@@ -41,6 +41,9 @@ export class ContentBuilder {
     this._horizontalAlignment = 'left';
     this._spaceBelow = 0;
     this._lineSpacing = 1.15;
+    this._rightMarginMM = 0;
+    this._firstLineIndentationMM = 0;
+    this._followingLinesIndentationMM = 0;
     return this;
   }
 

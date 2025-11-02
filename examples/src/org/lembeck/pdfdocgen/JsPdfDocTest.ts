@@ -62,7 +62,23 @@ export class JsPdfDocTest {
     cb.newParagraph().fontSize(12).text('So as this one is.');
     cb.newParagraph().spaceBelow(3).text('This paragraph is centered and is very long to demonstrate how text wrapping works in centered paragraphs. Let\'s add some more text to make sure it wraps around to the next line properly. Yes, this should be enough text now.');
 
-    cb.newParagraph().alignJustify().text('This paragraph is aligned justified. It is a very long paragraph to show, how justified text looks like. If you add a manual line break (\\n), the last line before the break will not be aligned justified but aligned to the left instead.\nJust like the line before this line.');
+    cb.newParagraph().reset().spaceBelow(3).alignJustify().text('This paragraph is aligned justified. It is a very long paragraph to show, how justified text looks like. If you add a manual line break (\\n), the last line before the break will not be aligned justified but aligned to the left instead.\nJust like the line before this line.');
+
+    cb.newParagraph().alignJustify()
+    .text('This is a paragraph without any indentation or right margins. ')
+    .text('It starts at the left side of the content area and ends at its right border.')
+    .newParagraph().firstLineIndentation(20)
+    .followingLinesIndentation(30)
+    .rightMargin(10)
+    .text('The first line of a Paragraph can have an own indentation. This one has one of 20 mm. ')
+    .text('Each following line can have another indentation. Here it is 30 mm for the second an all following lines. ')
+    .text('Although the whole paragraph can be specified to have a right margin. In this paragraph it is set to 10 mm.')
+    .reset().newParagraph().alignJustify()
+    .text('This is a paragraph without any indentation or right margins. ')
+    .text('It starts at the left side of the content area and ends at its right border.')
+    .spaceBelow(3);
+
+    cb.reset();
 
     cb.newParagraph().reset().fontColor('#7070d0')
     .text('You can specify a color for a paragraph.')
@@ -86,10 +102,6 @@ export class JsPdfDocTest {
 
 
     cb.reset().newPage().font(FontSpec.ROBOTO);
-    cb.firstLineIndentation(20);
-    cb.followingLinesIndentation(30);
-    cb.rightMargin(20);
-    cb.alignJustify();
     cb.text('First Paragraph on new page after page break.');
     cb.newParagraph().text('Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.');
     cb.newParagraph().text('Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.');
