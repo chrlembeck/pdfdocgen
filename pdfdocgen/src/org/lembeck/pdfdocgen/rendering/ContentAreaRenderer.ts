@@ -11,6 +11,9 @@ import {LayoutState} from '../layout/LayoutState.js';
 import {FloatingGraphic} from '../document/FloatingGraphic.js';
 import {GraphicElement} from '../layout/GraphicElement.js';
 import {LayoutResult} from '../layout/LayoutResult.js';
+import {ParagraphLine} from '../layout/ParagraphLine.js';
+import {Content} from '../document/Content.js';
+import {LineToken} from '../layout/LineToken.js';
 
 export function layoutContentArea(pdf: jsPDF,
                                   pageLayout: PageLayout,
@@ -32,12 +35,12 @@ export function layoutContentArea(pdf: jsPDF,
 
   let pageFull = false;
   do {
-    const nextContent = content.seek();
+    const nextContent: Content = content.seek();
     if (nextContent instanceof Paragraph) {
-      const remainingLines = [];
-      const tokenLines = nextContent.splitToLines(pdf, areaWidthMM, state, pageLayout);
-      for (let lineIndex = 0; lineIndex < tokenLines.length; lineIndex++){
-        const line = tokenLines[lineIndex];
+      const remainingLines: ParagraphLine[] = [];
+      const tokenLines: ParagraphLine[] = nextContent.splitToLines(pdf, areaWidthMM, state, pageLayout);
+      for (let lineIndex = 0; lineIndex < tokenLines.length; lineIndex++) {
+        const line: ParagraphLine = tokenLines[lineIndex];
         if (cursorY === contentArea.startYMM || line.height() <= remainingHeightMM) {
           cursorY += line.height();
           remainingHeightMM -= line.height();
@@ -54,8 +57,9 @@ export function layoutContentArea(pdf: jsPDF,
       if (remainingLines.length === 0) {
         content.remove();
       } else {
-        const newParagraph = nextContent.asThis();
-        remainingLines.forEach(l => l.tokens.forEach(t => newParagraph.addToken(t.token)));
+        const newParagraph: Paragraph = nextContent.asThis();
+        newParagraph.firstLineIndentationMM = newParagraph.followingLinesIndentationMM;
+        remainingLines.forEach((l: ParagraphLine) => l.tokens.forEach((t: LineToken) => newParagraph.addToken(t.token)));
         content.replace(newParagraph);
       }
       cursorY += nextContent.spaceBelow;

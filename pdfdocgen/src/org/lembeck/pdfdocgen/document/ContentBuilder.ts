@@ -28,6 +28,12 @@ export class ContentBuilder {
 
   private _spaceBelow: number = 0;
 
+  private _firstLineIndentationMM: number = 0;
+
+  private _followingLinesIndentationMM: number = 0;
+
+  private _rightMarginMM: number = 0;
+
   reset(): ContentBuilder {
     this._font = FontSpec.LIBRE_BASKERVILLE;
     this._fontSize = 12;
@@ -95,6 +101,10 @@ export class ContentBuilder {
       this._currentParagraph = new Paragraph(this._horizontalAlignment);
       this._currentParagraph.spaceBelow = this._spaceBelow;
       this._currentParagraph.lineSpacing = this._lineSpacing;
+      this._currentParagraph.firstLineIndentationMM = this._firstLineIndentationMM;
+      this._currentParagraph.followingLinesIndentationMM = this._followingLinesIndentationMM;
+      this._currentParagraph.rightMarginMM = this._rightMarginMM;
+      this._currentParagraph.alignment = this._horizontalAlignment;
       if (this._fontColor) {
         this._currentParagraph.color = this._fontColor;
       }
@@ -153,6 +163,32 @@ export class ContentBuilder {
     }
     return this;
   }
+
+  firstLineIndentation(firstLineIndentationMM: number): ContentBuilder {
+    this._firstLineIndentationMM = firstLineIndentationMM;
+    if (this._currentParagraph) {
+      this._currentParagraph.firstLineIndentationMM = firstLineIndentationMM;
+    }
+    return this;
+  }
+
+  followingLinesIndentation(followingLineIndentationMM: number): ContentBuilder {
+    this._followingLinesIndentationMM = followingLineIndentationMM;
+    if (this._currentParagraph) {
+      this._currentParagraph.followingLinesIndentationMM = followingLineIndentationMM;
+    }
+    return this;
+  }
+
+  rightMargin(rightMarginMM: number): ContentBuilder {
+    this._rightMarginMM = rightMarginMM;
+    if (this._currentParagraph) {
+      this._currentParagraph.rightMarginMM = rightMarginMM;
+    }
+    return this;
+  }
+
+
 
   alignCenter(): ContentBuilder {
     this._horizontalAlignment = 'center';

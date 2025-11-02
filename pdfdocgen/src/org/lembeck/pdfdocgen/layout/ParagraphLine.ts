@@ -10,6 +10,17 @@ export class ParagraphLine {
 
   endedByManualLineBreak: boolean = false;
 
+  leftMarginMM: number = 0;
+
+  rightMarginMM: number = 0;
+
+  constructor(leftMarginMM: number, rightMarginMM: number, endedByManualLineBreak: boolean = false, ...tokens: LineToken[]) {
+    this.tokens = tokens || [];
+    this.endedByManualLineBreak = endedByManualLineBreak;
+    this.leftMarginMM = leftMarginMM;
+    this.rightMarginMM = rightMarginMM;
+  }
+
   widthMM(): number {
     let width = 0;
     for (const token of this.tokens) {
@@ -39,7 +50,7 @@ export class ParagraphLine {
     return height;
   }
 
-  baselineOfsetMM() {
+  baselineOffsetMM() {
     let offset = 0;
     for (const token of this.tokens) {
       if (token.baselineOffsetMM > offset) {
@@ -50,8 +61,9 @@ export class ParagraphLine {
   }
 
   addToPageLayout(pageLayout: PageLayout, startXMM: number, cursorY: number, areaWidthMM: number, paragraph: Paragraph, lineIndex: number, totalNumberOfLines: number, state: LayoutState) {
-    let cursorX = startXMM;
-    const baselineOffset = this.baselineOfsetMM();
+    let cursorX = startXMM + this.leftMarginMM;
+    const baselineOffset = this.baselineOffsetMM();
+    const availableWidthMM = areaWidthMM - this.leftMarginMM - this.rightMarginMM;
 
     let adjustableSpaceCount = 0;
     const adjustableSpacesBefore = [0];
@@ -71,12 +83,12 @@ export class ParagraphLine {
       const lineToken = this.tokens[tokenIndex];
       let dx = 0;
       if (paragraph.alignment === 'center') {
-        dx = Math.max(0, (areaWidthMM - this.widthWithoutTrailingWhitespaceMM()) / 2);
+        dx = Math.max(0, (availableWidthMM - this.widthWithoutTrailingWhitespaceMM()) / 2);
       } else if (paragraph.alignment === 'right') {
-        dx = Math.max(0, areaWidthMM - this.widthWithoutTrailingWhitespaceMM());
+        dx = Math.max(0, availableWidthMM - this.widthWithoutTrailingWhitespaceMM());
       } else if (paragraph.alignment === 'justify') {
         dx = (adjustableSpaceCount === 0 || tokenIndex === 0 || this.endedByManualLineBreak || lineIndex == totalNumberOfLines - 1) ? 0 :
-            adjustableSpacesBefore[tokenIndex] * (areaWidthMM - this.widthWithoutTrailingWhitespaceMM()) / (adjustableSpaceCount);
+            adjustableSpacesBefore[tokenIndex] * (availableWidthMM - this.widthWithoutTrailingWhitespaceMM()) / (adjustableSpaceCount);
       }
       lineToken.token.addToPageLayout(pageLayout, cursorX + dx, cursorY - baselineOffset, lineToken.widthMM, paragraph, state);
       cursorX += lineToken.widthMM;

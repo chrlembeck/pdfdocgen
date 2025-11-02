@@ -17,6 +17,12 @@ export class Paragraph implements Content {
 
   private _lineSpacing: number = 1.15;
 
+  private _firstLineIndentationMM: number = 0;
+
+  private _followingLinesIndentationMM: number = 0;
+
+  private _rightMarginMM: number = 0;
+
   private _alignment: 'left' | 'center' | 'right' | 'justify' = 'left';
 
   constructor(alignment: 'left' | 'center' | 'right' | 'justify' = 'left', ...tokens: Token[]) {
@@ -80,14 +86,39 @@ export class Paragraph implements Content {
     this._spaceBelow = value;
   }
 
+  get firstLineIndentationMM(): number {
+    return this._firstLineIndentationMM;
+  }
+
+  set firstLineIndentationMM(value: number) {
+    this._firstLineIndentationMM = value;
+  }
+
+  get followingLinesIndentationMM(): number {
+    return this._followingLinesIndentationMM;
+  }
+
+  set followingLinesIndentationMM(value: number) {
+    this._followingLinesIndentationMM = value;
+  }
+
+  get rightMarginMM(): number {
+    return this._rightMarginMM;
+  }
+
+  set rightMarginMM(value: number) {
+    this._rightMarginMM = value;
+  }
+
   splitToLines(pdf: jsPDF, areaWidthMM: number, state: LayoutState, layout: PageLayout): ParagraphLine[] {
     if (this._tokens.length === 0) {
       return [];
     }
+
     this.normalizeTokens();
     const result: ParagraphLine[] = [];
-    let remainingMM = areaWidthMM;
-    let currentLine = new ParagraphLine();
+    let currentLine = new ParagraphLine(this.firstLineIndentationMM, this.rightMarginMM);
+    let remainingMM = areaWidthMM - this.firstLineIndentationMM - this.rightMarginMM;
     result.push(currentLine);
     let currentToken: Token | undefined = this._tokens[0];
     let tokenIndex = 0;
@@ -97,8 +128,8 @@ export class Paragraph implements Content {
         tokenIndex++;
         currentLine.endedByManualLineBreak = true;
         if (tokenIndex < this._tokens.length) {
-          remainingMM = areaWidthMM;
-          currentLine = new ParagraphLine();
+          currentLine = new ParagraphLine(this.followingLinesIndentationMM, this.rightMarginMM);
+          remainingMM = areaWidthMM - this.followingLinesIndentationMM - this.rightMarginMM;
           result.push(currentLine);
         }
         currentToken = tokenIndex < this._tokens.length ? this._tokens[tokenIndex] : undefined;
@@ -110,9 +141,9 @@ export class Paragraph implements Content {
           if (splitToken.remaining) {
             // Token wurde geteilt, der Rest kommt in die nächste Zeile
             currentToken = splitToken.remaining;
-            currentLine = new ParagraphLine();
+            currentLine = new ParagraphLine(this.followingLinesIndentationMM, this.rightMarginMM);
             result.push(currentLine);
-            remainingMM = areaWidthMM;
+            remainingMM = areaWidthMM - this.followingLinesIndentationMM - this.rightMarginMM;
             continue;
           } else {
             // Ganzes Token wurde verarbeitet, nächstes Token holen
@@ -125,18 +156,18 @@ export class Paragraph implements Content {
           // das erste Token passt nicht in die Zeile
           if (currentLine.widthMM() > 0) {
             // Zeile war schon angefangen, also neue Zeile anfangen
-            currentLine = new ParagraphLine();
+            currentLine = new ParagraphLine(this.followingLinesIndentationMM, this.rightMarginMM);
             result.push(currentLine);
-            remainingMM = areaWidthMM;
+            remainingMM = areaWidthMM - this.followingLinesIndentationMM - this.rightMarginMM;
             continue;
           } else {
             // Token passt nicht in die Zeile, die Zeile war aber leer. - Es gibt einen Überhang.
             console.warn('Token passt nicht in die Zeile: ' + JSON.stringify(splitToken.first) + ' remaining: ' + JSON.stringify(splitToken.remaining));
             currentLine.tokens.push(splitToken.first);
             // Zeile ist jetzt voll.
-            currentLine = new ParagraphLine();
+            currentLine = new ParagraphLine(this.followingLinesIndentationMM, this.rightMarginMM);
             result.push(currentLine);
-            remainingMM = areaWidthMM;
+            remainingMM = areaWidthMM - this.followingLinesIndentationMM - this.rightMarginMM;
             if (splitToken.remaining) {
               currentToken = splitToken.remaining;
             } else {
@@ -155,6 +186,11 @@ export class Paragraph implements Content {
     const p = new Paragraph(this._alignment);
     p.color = this.color;
     p.spaceBelow = this.spaceBelow;
+    p.firstLineIndentationMM = this.firstLineIndentationMM;
+    p.followingLinesIndentationMM = this.followingLinesIndentationMM;
+    p.rightMarginMM = this.rightMarginMM;
+    p.alignment = this.alignment;
+    p.lineSpacing = this.lineSpacing;
     return p;
   }
 
