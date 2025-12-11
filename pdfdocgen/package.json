@@ -17,11 +17,11 @@
   ],
   "type": "module",
   "author": "Christoph Lembeck",
-  "homepage": "https://github.com/chrlembeck/jspdfgen",
+  "homepage": "https://github.com/chrlembeck/pdfdocgen",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chrlembeck/jspdfgen.git"
+    "url": "git+https://github.com/chrlembeck/pdfdocgen.git"
   },
   "scripts": {
     "pdfdocgen-build": "tsc -p .",
